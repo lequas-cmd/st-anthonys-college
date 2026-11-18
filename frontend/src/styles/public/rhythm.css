@@ -1,0 +1,75 @@
+/* =========================================================
+   Public-site spacing rhythm
+   Keep major sections on one responsive vertical-spacing scale.
+   This file is imported last so it can normalize older page rules
+   without changing component appearance or page structure.
+   ========================================================= */
+
+/* Major content sections share the same top and bottom rhythm (DESIGN.md: 96px section). */
+.section,
+.intro-section,
+.values-section,
+.testimonials-section,
+.announcement-band,
+.announcement-compact-section,
+.news-events-section,
+.home-contact-strip,
+.leadership-section {
+  padding-block: var(--section-space);
+}
+
+/* Split image-and-copy sections use the same rhythm as full-width bands. */
+.split-feature {
+  padding-top: var(--section-space);
+}
+
+/* Page titles sit closer to the content that follows, without crowding it. */
+.page-intro {
+  padding-block: clamp(2.5rem, 4vw, 3.5rem) 1.5rem;
+}
+
+/* Use a consistent gap between section titles and their content. */
+.section-heading {
+  gap: var(--content-gap);
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.section-lead {
+  margin: 0 0 2rem;
+}
+
+/* Avoid uneven spacing between adjacent content blocks. */
+.intro-grid,
+.values-layout,
+.testimonials-wrap,
+.news-events-layout,
+.home-contact-panel {
+  row-gap: var(--content-gap);
+}
+
+@media (max-width: 760px) {
+  .section,
+  .intro-section,
+  .values-section,
+  .testimonials-section,
+  .announcement-band,
+  .announcement-compact-section,
+  .news-events-section,
+  .home-contact-strip,
+  .leadership-section,
+  .split-feature {
+    padding-block: var(--section-space-compact);
+  }
+
+  .page-intro {
+    padding-block: 2rem 1.25rem;
+  }
+
+  .section-heading {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-lead {
+    margin-bottom: 1.5rem;
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "saint-anthonys-college-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/config/database.js && node --check src/middleware/authenticate.js && node --check src/utils/audit.js && node --check src/modules/auth/auth.routes.js && node --check src/modules/dashboard/dashboard.routes.js && node --check src/modules/announcements/announcements.routes.js && node --check src/modules/programs/programs.routes.js && node --check src/modules/news/news.routes.js && node --check src/modules/events/events.routes.js && node --check src/modules/health/health.routes.js",
+    "db:import": "node scripts/import-database.js",
+    "db:migrate": "node -e \"import('./src/config/database.js').then(({ applyAdditiveMigrations }) => applyAdditiveMigrations().then(() => console.log('Migrations applied.')).catch((error) => { console.error(error); process.exit(1); }));\"",
+    "db:seed": "node scripts/seed-demo-data.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.12.0"
+  }
+}

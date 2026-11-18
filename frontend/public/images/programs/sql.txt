@@ -1,0 +1,43 @@
+UPDATE programs
+SET image_url = '/images/programs/computer-science.jpg'
+WHERE code = 'ICT';
+
+UPDATE programs
+SET image_url = '/images/programs/business.jpg'
+WHERE code = 'ACC';
+
+UPDATE programs
+SET image_url = '/images/programs/engineering.jpg'
+WHERE code = 'CON';
+
+
+UPDATE programs
+SET image_url = '/images/programs/Einstallation.jpg'
+WHERE code = 'ELI';
+
+
+UPDATE programs
+SET image_url = '/images/programs/automotive.jpg'
+WHERE code = 'AUT';
+
+
+UPDATE programs
+SET image_url = '/images/programs/welding.jpg'
+WHERE code = 'WLD';
+
+
+UPDATE programs
+SET image_url = '/images/programs/plumbing.jpg'
+WHERE code = 'PLB';
+
+
+UPDATE programs
+SET image_url = '/images/programs/hospitality.jpg'
+WHERE code = 'HOT';
+
+
+UPDATE programs
+SET image_url = '/images/programs/mechanic.jpg'
+WHERE code = 'MEC';
+
+o

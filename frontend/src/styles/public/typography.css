@@ -1,0 +1,218 @@
+/* =========================================================
+   Saint Anthony's – public-site typography
+   Editorial system: weight 500 display type, measured negative
+   tracking, single font family for UI (Inter), serif for reading
+   (Newsreader), Ethiopic for Amharic.
+   ========================================================= */
+
+/* Display hierarchy – weight 500, negative tracking scales with size */
+.hero h1 {
+  font-size: clamp(2.375rem, 5.2vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.page-intro h1,
+.detail-hero h1,
+.article h1 {
+  font-size: var(--heading-lg);
+  line-height: 1.08;
+  letter-spacing: -0.038em;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.intro-title h2,
+.section-heading h2,
+.values-intro h2,
+.events-intro h2,
+.split-feature h2,
+.callout h2,
+.steps-column h2,
+.contact-details h2,
+.testimonial-intro h2,
+.admissions-panel h2,
+.home-contact-copy h2,
+.leadership-section .section-heading h2 {
+  font-size: var(--heading-md);
+  line-height: var(--heading-leading);
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Admissions panel sits on a dark background – force white headings */
+.admissions-panel h2 {
+  color: #fff;
+}
+
+.detail-columns h2,
+.article-body h2 {
+  font-size: var(--heading-sm);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.program-card h3,
+.news-card h3,
+.facility-card h3,
+.three-columns h3,
+.leadership-body h3,
+.value-item h3,
+.mini-update h3,
+.announcement-item h3,
+.news-featured-body h3,
+.event-row h3,
+.step-row h3,
+.detail-columns h3 {
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  line-height: 1.3;
+  letter-spacing: -0.018em;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Body copy: comfortable leading, consistent readable measure */
+.page-intro > p,
+.section-lead,
+.split-feature p,
+.detail-hero > div > p,
+.detail-columns p,
+.callout p,
+.article-deck,
+.article-body p,
+.step-row p,
+.event-row p,
+.three-columns p,
+.program-card p,
+.news-card p,
+.facility-card p,
+.value-item p,
+.mini-update p,
+.announcement-item p,
+.news-featured-body p {
+  line-height: var(--body-leading);
+}
+
+.page-intro > p,
+.section-lead,
+.split-feature p,
+.callout p,
+.detail-hero > div > p {
+  max-width: var(--copy-measure);
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+}
+
+.page-intro > p {
+  color: var(--muted);
+}
+
+.section-lead {
+  margin-top: 0;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.article-body p {
+  font-size: clamp(1.0625rem, 1.35vw, 1.1875rem);
+  line-height: 1.75;
+  margin-block: 0 1.25em;
+}
+
+.article-body h2 {
+  margin-top: 2.25em;
+  margin-bottom: 0.65em;
+}
+
+/* Eyebrow – sentence case, weight 500, no all-caps tracking */
+.eyebrow {
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  color: var(--muted);
+}
+
+/* Small supporting labels */
+.card-meta,
+.detail-facts span,
+.leadership-role,
+.small-note,
+.footer {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Control typography */
+.search-strip input,
+.search-field input,
+.directory-tools select,
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+  font: inherit;
+  line-height: 1.4;
+}
+
+.search-strip input::placeholder,
+.search-field input::placeholder,
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #73737a;
+  opacity: 1;
+}
+
+.search-strip input:focus-visible,
+.search-field input:focus-visible,
+.directory-tools select:focus-visible,
+.contact-form input:focus-visible,
+.contact-form select:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Measure limit for long-form reading */
+.article-body,
+.article-deck {
+  max-width: var(--copy-measure);
+}
+
+@media (max-width: 760px) {
+  .hero h1 {
+    font-size: clamp(2.125rem, 9vw, 3rem);
+    line-height: 1.08;
+  }
+
+  .page-intro h1,
+  .detail-hero h1,
+  .article h1 {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    line-height: 1.1;
+  }
+
+  .intro-title h2,
+  .section-heading h2,
+  .values-intro h2,
+  .events-intro h2,
+  .split-feature h2,
+  .callout h2,
+  .steps-column h2,
+  .contact-details h2,
+  .testimonial-intro h2,
+  .admissions-panel h2,
+  .home-contact-copy h2,
+  .leadership-section .section-heading h2 {
+    font-size: clamp(1.625rem, 6.5vw, 2.125rem);
+    line-height: 1.14;
+  }
+
+  .article-body p {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+}
