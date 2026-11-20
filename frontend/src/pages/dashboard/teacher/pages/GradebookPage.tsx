@@ -10,8 +10,6 @@ type Props = { classes: TeacherClass[]; selectedClassId: number | null; loading:
 
 type CellState = "idle" | "saving" | "saved" | "error";
 
-const ABSENT = "A";
-const EXCUSED = "E";
 
 function letterGrade(score: number | null, scale: any): string {
   if (score == null) return "—";
@@ -51,7 +49,6 @@ export default function GradebookPage({ classes, selectedClassId, loading: paren
   const [modalTitle, setModalTitle] = useState("");
   const [modalFields, setModalFields] = useState<CrudField[]>([]);
   const [modalHandler, setModalHandler] = useState<(v: Record<string, string>) => Promise<void>>(async () => {});
-  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
 
   const selected = classes.find((c) => c.id === selectedClassId) ?? classes[0] ?? null;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
-import AdminDataTable, { Column } from "../components/AdminDataTable";
-import AdminCrudModal, { CrudField } from "../components/AdminCrudModal";
+import AdminDataTable from "../components/AdminDataTable";
+import AdminCrudModal from "../components/AdminCrudModal";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
@@ -10,11 +10,11 @@ type Session = { id: number; offering_id: number; session_date: string; topic: s
 
 export default function AttendancePage({ data, loading: parentLoading }: { data: any; loading: boolean }) {
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [offerings, setOfferings] = useState<any[]>([]);
+  const [, setOfferings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<number | null>(null);
-  const [records, setRecords] = useState<any[]>([]);
+  const [, setRecords] = useState<any[]>([]);
   const [roster, setRoster] = useState<any[]>([]);
   const [marks, setMarks] = useState<Record<number, string>>({});
   const [report, setReport] = useState<any[]>([]);

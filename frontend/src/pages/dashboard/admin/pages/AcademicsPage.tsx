@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
-import AdminDataTable, { Column } from "../components/AdminDataTable";
+import AdminDataTable from "../components/AdminDataTable";
 import AdminCrudModal, { CrudField } from "../components/AdminCrudModal";
 import ConfirmDialog from "../components/ConfirmDialog";
-import StatusBadge from "../components/StatusBadge";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
-import EmptyState from "../components/EmptyState";
 
 type Tab = "departments" | "programs" | "courses" | "offerings" | "rooms" | "timetable" | "calendar" | "enrollments";
 
@@ -22,8 +20,8 @@ export default function AcademicsPage({ data, loading: parentLoading }: { data: 
   const [rooms, setRooms] = useState<any[]>([]);
   const [timetable, setTimetable] = useState<any[]>([]);
   const [calendar, setCalendar] = useState<any[]>([]);
-  const [academicYears, setAcademicYears] = useState<any[]>([]);
-  const [semesters, setSemesters] = useState<any[]>([]);
+  const [, setAcademicYears] = useState<any[]>([]);
+  const [, setSemesters] = useState<any[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
 

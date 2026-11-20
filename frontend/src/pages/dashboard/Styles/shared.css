@@ -24,18 +24,18 @@
    ------------------------------------------------------------------------ */
 :root {
   /* Surfaces & ink (DESIGN.md `colors`) */
-  --ds-canvas: #f5f1ec;
+  --ds-canvas: #FAF6F0;
   --ds-surface: #ffffff;
-  --ds-surface-2: #ebe7e1;
-  --ds-ink: #111111;
-  --ds-ink-muted: #626260;
-  --ds-ink-subtle: #7b7b78;
+  --ds-surface-2: #f3ece3;
+  --ds-ink: #2B1B17;
+  --ds-ink-muted: #7a5c52;
+  --ds-ink-subtle: #9e7a6e;
   --ds-ink-disabled: #9c9fa5;
-  --ds-hairline: #d3cec6;
-  --ds-hairline-soft: #ebe7e1;
-  --ds-inverse: #111111;
+  --ds-hairline: #d9c9be;
+  --ds-hairline-soft: #e8dbd4;
+  --ds-inverse: #3E2723;
   --ds-inverse-ink: #ffffff;
-  --ds-inverse-muted: #c9c6c1;
+  --ds-inverse-muted: #c4a898;
   --ds-pressed: #000000;
 
   /* Report palette – chart fills / dots only (never brand surfaces) */
@@ -2037,3 +2037,66 @@
     font-size: 13px;
   }
 }
+
+
+/* ---------------------------------------------------------------------------
+   Student portal overrides — Espresso branded sidebar + cream topbar
+   ------------------------------------------------------------------------ */
+
+/* Student portal sidebar — Espresso branded */
+.sa-student .sa-sidebar {
+  background: #3E2723;
+  border-right-color: rgba(255,255,255,0.1);
+}
+.sa-student .sa-brand strong { color: #ffffff; }
+.sa-student .sa-brand span { color: rgba(255,255,255,0.65); }
+.sa-student .sa-crest {
+  background: rgba(255,255,255,0.15);
+  color: #ffffff;
+}
+.sa-student .sa-role { color: rgba(255,255,255,0.5); }
+.sa-student .sa-nav a,
+.sa-student .sa-nav button {
+  color: rgba(255,255,255,0.72);
+}
+.sa-student .sa-nav a:hover,
+.sa-student .sa-nav button:hover {
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+}
+.sa-student .sa-nav a.active,
+.sa-student .sa-nav a[aria-current="page"] {
+  background: rgba(255,255,255,0.14);
+  color: #ffffff;
+  box-shadow: none;
+}
+.sa-student .sa-logout-btn {
+  border-color: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+}
+.sa-student .sa-logout-btn:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.3);
+}
+.sa-student .sa-sidebar-bottom {
+  background: rgba(255,255,255,0.08);
+}
+.sa-student .sa-sidebar-bottom strong { color: #ffffff; }
+.sa-student .sa-sidebar-bottom span { color: rgba(255,255,255,0.6); }
+.sa-student .sa-help-icon {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #ffffff;
+}
+.sa-student .sa-sidebar-bottom .sa-chevron { color: rgba(255,255,255,0.4); }
+/* Mobile close button on dark sidebar */
+.sa-student .sa-sidebar-close { color: rgba(255,255,255,0.8); }
+
+/* Student topbar — cream strip with espresso accents */
+.sa-student .sa-topbar {
+  background: #ffffff;
+  border-bottom: 1px solid #d9c9be;
+}
+.sa-student .sa-breadcrumb { color: #7a5c52; }
+.sa-student .sa-breadcrumb span { color: #c4afa5; }

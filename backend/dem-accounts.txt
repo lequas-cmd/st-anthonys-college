@@ -1,4 +1,0 @@
-Role	Username	Password
-Admin	demo_admin	Demo@12345
-Teacher	demo_teacher01	Demo@12345
-Student	demo_student01	Demo@12345

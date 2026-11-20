@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
 import { TeacherClass } from "../TeacherDashboard";
-import AdminCrudModal, { CrudField } from "../../admin/components/AdminCrudModal";
+import AdminCrudModal from "../../admin/components/AdminCrudModal";
 import LoadingState from "../../admin/components/LoadingState";
 import ErrorState from "../../admin/components/ErrorState";
 import EmptyState from "../../admin/components/EmptyState";
@@ -18,8 +18,8 @@ export default function AttendancePage({ data, loading: parentLoading }: Props) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [sessionDate, setSessionDate] = useState("");
-  const [topic, setTopic] = useState("");
+  const [, setSessionDate] = useState("");
+  const [, setTopic] = useState("");
 
   useEffect(() => { if (classes.length && selectedClassId == null) setSelectedClassId(classes[0].id); }, [classes]);
 

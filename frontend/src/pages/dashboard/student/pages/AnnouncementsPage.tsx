@@ -58,13 +58,13 @@ export default function AnnouncementsPage({ studentId, studentName }: Props) {
 
   return (
     <>
-      <section className="sa-panel sa-st-flush" aria-labelledby="overview-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="overview-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="overview-h">Announcements</h3>
             <p>
               College, department and class notices. Unread items are marked — open one to mark it as read.
-              {unreadCount > 0 ? <span className="sa-st-unread">{unreadCount} unread</span> : null}
+              {unreadCount > 0 ? <span className="sa-badge terracotta">{unreadCount} unread</span> : null}
             </p>
           </div>
         </div>
@@ -76,21 +76,18 @@ export default function AnnouncementsPage({ studentId, studentName }: Props) {
             {announcements.map((notice) => (
               <article
                 key={notice.id}
-                className={`sa-task-row sa-st-notice${notice.is_read ? " is-done" : ""}`}
+                className={`sa-notice-card${notice.is_unread === false ? " is-read" : " is-unread"}`}
                 onClick={() => !notice.is_read && markRead(notice.id)}
                 role="button"
                 tabIndex={0}
-                style={{ cursor: "pointer" }}
               >
-                <div className="sa-task-dot" aria-hidden="true">
-                  {notice.is_read ? "✓" : "•"}
-                </div>
-                <div className="sa-task-info">
-                  <strong>{notice.title}</strong>
-                  <p>{notice.body}</p>
-                  <small>
+                <div className="sa-notice-dot" aria-hidden="true">{notice.is_read ? "✓" : "•"}</div>
+                <div className="sa-notice-info">
+                  <span className="notice-title">{notice.title}</span>
+                  <span className="notice-body">{notice.body}</span>
+                  <span className="notice-meta">
                     {formatDate(notice.published_at)} · {scopeLabel(notice.scope)}
-                  </small>
+                  </span>
                 </div>
                 <span className={`sa-badge ${notice.is_read ? "success" : "info"}`}>
                   {notice.is_read ? "Read" : "Unread"}

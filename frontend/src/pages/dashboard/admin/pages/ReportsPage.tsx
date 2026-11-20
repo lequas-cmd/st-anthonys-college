@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
-import AdminDataTable, { Column } from "../components/AdminDataTable";
+import AdminDataTable from "../components/AdminDataTable";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";

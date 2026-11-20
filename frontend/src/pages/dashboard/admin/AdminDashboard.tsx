@@ -4,7 +4,6 @@ import { BarChart3, BookOpenText, BriefcaseBusiness, LayoutDashboard, LogOut, Me
 import "../../../styles/dashboard/shared.css";
 import "../../../styles/dashboard/student.css";
 import { apiRequest } from "../../../services/api";
-import AdminCrudModal, { CrudField } from "./components/AdminCrudModal";
 import SkeletonLoader from "../../../components/SkeletonLoader";
 import { AdminDashboardResponse, AdminTab } from "./adminUtils";
 import OverviewPage from "./pages/OverviewPage";
@@ -35,21 +34,12 @@ const tabLabels: Record<AdminTab, string> = {
   settings: "Settings",
 };
 
-type AdminModalState = {
-  title: string;
-  submitLabel: string;
-  fields: CrudField[];
-  onSubmit: (values: Record<string, string>) => Promise<void> | void;
-};
-
 export default function AdminDashboard() {
   const [tab, setTab] = useState<AdminTab>("overview");
   const [query, setQuery] = useState("");
-  const [period, setPeriod] = useState("This semester");
   const [summary, setSummary] = useState<AdminDashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modal, setModal] = useState<AdminModalState | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -76,132 +66,6 @@ export default function AdminDashboard() {
     loadDashboard();
     return () => { active = false; };
   }, []);
-
-  const openAddModal = (entity: "student" | "teacher" | "program" | "announcement") => {
-    const configMap: Record<typeof entity, { title: string; submitLabel: string; fields: CrudField[] }> = {
-      student: {
-        title: "Add new student",
-        submitLabel: "Create student",
-        fields: [
-          { name: "first_name", label: "First name", placeholder: "Amina", required: true },
-          { name: "last_name", label: "Last name", placeholder: "Bekele", required: true },
-          { name: "student_number", label: "Student number", placeholder: "ST-2026-001", required: true },
-          { name: "program", label: "Program", placeholder: "Computer Science", required: true },
-          { name: "enrollment_year", label: "Enrollment year", type: "number", placeholder: "2026", required: true },
-          { name: "username", label: "Username", placeholder: "amina.bekele" },
-          { name: "password", label: "Password", type: "password", placeholder: "Password123!" },
-        ],
-      },
-      teacher: {
-        title: "Add new faculty member",
-        submitLabel: "Create teacher",
-        fields: [
-          { name: "first_name", label: "First name", placeholder: "Daniel", required: true },
-          { name: "last_name", label: "Last name", placeholder: "Tadesse", required: true },
-          { name: "employee_number", label: "Employee number", placeholder: "TE-1001", required: true },
-          { name: "department", label: "Department", placeholder: "Computer Science", required: true },
-          { name: "username", label: "Username", placeholder: "daniel.tadesse" },
-          { name: "password", label: "Password", type: "password", placeholder: "Password123!" },
-        ],
-      },
-      program: {
-        title: "Add new program",
-        submitLabel: "Create program",
-        fields: [
-          { name: "code", label: "Program code", placeholder: "CS-2026", required: true },
-          { name: "title", label: "Program title", placeholder: "Computer Science", required: true },
-          { name: "department", label: "Department", placeholder: "ICT", required: true },
-          { name: "qualification_level", label: "Qualification level", placeholder: "Level I" },
-          { name: "duration_years", label: "Duration (years)", type: "number", placeholder: "2" },
-          { name: "description", label: "Description", type: "textarea", placeholder: "Short description" },
-        ],
-      },
-      announcement: {
-        title: "Add announcement",
-        submitLabel: "Create announcement",
-        fields: [
-          { name: "title", label: "Title", placeholder: "New intake opens", required: true },
-          { name: "body", label: "Message", type: "textarea", placeholder: "Write the announcement text", required: true },
-          { name: "link_url", label: "Link URL", placeholder: "/announcements" },
-          { name: "audience", label: "Audience", placeholder: "students" },
-        ],
-      },
-    };
-
-    const config = configMap[entity];
-    setModal({
-      title: config.title,
-      submitLabel: config.submitLabel,
-      fields: config.fields,
-      onSubmit: async (values) => {
-        if (entity === "student") {
-          const newStudent = await apiRequest<{ student: { student_number: string; first_name: string; last_name: string; program: string; enrollment_year: number; status: string } }>("/dashboard/admin/students", {
-            method: "POST",
-            body: JSON.stringify({
-              first_name: values.first_name,
-              last_name: values.last_name,
-              student_number: values.student_number,
-              program: values.program,
-              enrollment_year: Number(values.enrollment_year || new Date().getFullYear()),
-              username: values.username || undefined,
-              password: values.password || undefined,
-            }),
-          });
-
-          setSummary((current) => {
-            if (!current) return current;
-            return {
-              ...current,
-              totals: { ...current.totals, students: current.totals.students + 1 },
-              students: [
-                {
-                  student_number: newStudent.student.student_number,
-                  first_name: newStudent.student.first_name,
-                  last_name: newStudent.student.last_name,
-                  program: newStudent.student.program,
-                  enrollment_year: newStudent.student.enrollment_year,
-                  status: newStudent.student.status,
-                },
-                ...current.students,
-              ],
-            };
-          });
-        }
-
-        if (entity === "teacher") {
-          await apiRequest<{ teacher: { employee_number: string } }>("/dashboard/admin/teachers", {
-            method: "POST",
-            body: JSON.stringify({
-              first_name: values.first_name,
-              last_name: values.last_name,
-              employee_number: values.employee_number,
-              department: values.department,
-              username: values.username || undefined,
-              password: values.password || undefined,
-            }),
-          });
-        }
-
-        if (entity === "program") {
-          await apiRequest<{ program: { id: number; code: string; name: string } }>("/dashboard/admin/programs", {
-            method: "POST",
-            body: JSON.stringify({
-              code: values.code,
-              title: values.title,
-              department: values.department,
-              qualification_level: values.qualification_level || "Level I",
-              duration_years: Number(values.duration_years || 2),
-              description: values.description || `${values.title} program.`,
-            }),
-          });
-        }
-
-        if (entity === "announcement") {
-          setSummary((current) => current ? { ...current, totals: { ...current.totals } } : current);
-        }
-      },
-    });
-  };
 
   const handleDeleteStudent = async (studentNumber: string) => {
     await apiRequest(`/dashboard/admin/students/${encodeURIComponent(studentNumber)}`, { method: "DELETE" });
@@ -308,19 +172,6 @@ export default function AdminDashboard() {
         </section>
       </main>
 
-      {modal && (
-        <AdminCrudModal
-          open={!!modal}
-          title={modal.title}
-          submitLabel={modal.submitLabel}
-          fields={modal.fields}
-          onClose={() => setModal(null)}
-          onSubmit={async (values) => {
-            await modal.onSubmit(values);
-            setModal(null);
-          }}
-        />
-      )}
     </div>
   );
 }

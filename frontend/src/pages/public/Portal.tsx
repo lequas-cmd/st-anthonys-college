@@ -1,6 +1,15 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Eye, EyeOff, GraduationCap, ShieldCheck } from 'lucide-react'
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  BookOpen,
+  Users,
+  Award,
+  MapPin,
+  Phone,
+} from 'lucide-react'
 import { apiRequest } from '../../services/api'
 import '../../styles/portal.css'
 
@@ -19,6 +28,24 @@ const dashboardRoutes: Record<LoginResponse['user']['role'], string> = {
   admin: '/dashboard/admin',
 }
 
+const highlights = [
+  {
+    icon: BookOpen,
+    label: 'Academic Access',
+    desc: 'View your courses, grades, attendance, and academic records.',
+  },
+  {
+    icon: Users,
+    label: 'Community Connection',
+    desc: 'Stay updated on campus events, announcements, and college life.',
+  },
+  {
+    icon: Award,
+    label: 'Your Progress',
+    desc: 'Track your learning journey and download official documents.',
+  },
+]
+
 export default function Portal() {
   const navigate = useNavigate()
   const [username, setUsername] = React.useState('')
@@ -32,7 +59,7 @@ export default function Portal() {
     setError('')
 
     if (!username.trim() || !password) {
-      setError('Enter your username and password to continue.')
+      setError('Please enter your username and password to continue.')
       return
     }
 
@@ -63,12 +90,12 @@ export default function Portal() {
         normalized.includes('networkerror') ||
         normalized.includes('fetch failed')
       ) {
-        setError('Cannot connect to the sign-in service. Check that the backend and database are running, then try again.')
+        setError('Cannot connect to the sign-in service. Please check your connection and try again.')
       } else if (
         normalized.includes('invalid username or password') ||
         normalized.includes('invalid credentials')
       ) {
-        setError('Invalid username or password. Demo accounts may not have valid passwords configured yet.')
+        setError('Invalid username or password. Please try again or contact the admissions office.')
       } else {
         setError(message || 'Unable to sign in right now. Please try again.')
       }
@@ -79,105 +106,193 @@ export default function Portal() {
 
   return (
     <div className="portal-page">
-      <div className="portal-ambient portal-ambient-green" aria-hidden="true" />
-      <div className="portal-ambient portal-ambient-amber" aria-hidden="true" />
 
-      <header className="portal-header">
-        <Link className="portal-brand" to="/" aria-label="Saint Anthony's College home">
-          <span className="portal-brand-mark" aria-hidden="true">
-            <GraduationCap size={22} strokeWidth={1.7} />
-          </span>
-          <span className="portal-brand-copy">
-            <span className="portal-brand-name">Saint Anthony's</span>
-            <span className="portal-brand-subtitle">TVET Portal</span>
-          </span>
-        </Link>
-
-        <div className="portal-header-actions">
-          <Link className="portal-help-link" to="/contact">Need help? Contact the college</Link>
-          <Link className="portal-site-link" to="/">
-            Back to college site <ArrowRight size={14} aria-hidden="true" />
+      {/* ── Thin top navigation bar ── */}
+      <div className="portal-topbar">
+       
+        <div className="portal-topbar-inner">
+          <Link to="/" className="portal-topbar-brand">
+                <span className="portal-topbar-logo" aria-hidden="true">
+                  <img src="/images/college-logo.png" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                </span>
+                <span className="portal-topbar-name">Saint Anthony's TVET College</span>
           </Link>
-        </div>
-      </header>
 
-      <main className="portal-main">
-        <section className="portal-form-wrap" aria-labelledby="portal-title">
-          <div className="portal-heading">
-            <div className="portal-heading-icon"><GraduationCap size={23} strokeWidth={1.8} /></div>
-            <p className="portal-eyebrow"><span /> Institutional access</p>
-            <h1 id="portal-title">Sign in to Saint Anthony's</h1>
-            <p className="portal-intro">
-              Use your official institutional username to access your courses, academic records, and college services.
-            </p>
+          <div className="portal-topbar-actions">
+            <Link className="portal-help-link" to="/contact">Need help?</Link>
+            <Link className="portal-site-link" to="/">
+              ← Back to college website
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main split layout ── */}
+      <main className="portal-split">
+
+        {/* LEFT PANEL — Institutional identity */}
+        <aside className="portal-left" aria-hidden="true">
+          <div className="portal-left-inner">
+
+            {/* Identity block */}
+            <div className="portal-identity">
+              <p className="portal-identity-eyebrow">Emdibir · Gurage Zone · Ethiopia</p>
+              <h2 className="portal-identity-heading">
+                Learning that transforms lives and strengthens communities.
+              </h2>
+              <p className="portal-identity-lead">
+                Welcome back to the St. Anthony's student and staff portal — your gateway to academic resources, records, and college services.
+              </p>
+            </div>
+
+            {/* Portal access highlights */}
+            <ul className="portal-highlights" role="list">
+              {highlights.map(({ icon: Icon, label, desc }) => (
+                <li key={label} className="portal-highlight-item">
+                  <span className="portal-highlight-icon">
+                    <Icon size={18} strokeWidth={1.8} />
+                  </span>
+                  <span className="portal-highlight-copy">
+                    <strong>{label}</strong>
+                    <span>{desc}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Partner logos strip */}
+            <div className="portal-partners">
+              <p className="portal-partners-label">Supported by</p>
+              <div className="portal-partners-logos">
+                <div className="portal-partner-badge">
+                  <img src="/images/church-logo.png" alt="Ethiopian Catholic Church" onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+                  <span>Ethiopian Catholic Church</span>
+                </div>
+                <div className="portal-partner-divider" aria-hidden="true" />
+                <div className="portal-partner-badge">
+                  <img src="/images/crs-logo.png" alt="Catholic Relief Services" onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+                  <span>Catholic Relief Services</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact strip */}
+            <div className="portal-contact-strip">
+              <a href="tel:+251911000000" className="portal-contact-item">
+                <Phone size={13} strokeWidth={2} />
+                +251 911 000 000
+              </a>
+              <span className="portal-contact-divider" aria-hidden="true">·</span>
+              <a href="mailto:info@stanthonytvet.edu.et" className="portal-contact-item">
+                info@stanthonytvet.edu.et
+              </a>
+              <span className="portal-contact-divider" aria-hidden="true">·</span>
+              <span className="portal-contact-item">
+                <MapPin size={13} strokeWidth={2} />
+                Emdibir, Ethiopia
+              </span>
+            </div>
+
           </div>
 
-          <form className="portal-auth-form" onSubmit={handleSubmit} noValidate>
-            <label className="portal-field">
-              <span>College Username</span>
-              <input
-                name="username"
-                autoComplete="username"
-                value={username}
-                onChange={(event) => { setUsername(event.target.value); setError('') }}
-                placeholder="Enter your college username"
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? 'portal-login-error' : undefined}
-              />
-            </label>
+          {/* Background image overlay */}
+          <div className="portal-left-bg" aria-hidden="true">
+            <img
+              src="/images/campus-hero.jpg"
+              alt=""
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+            />
+          </div>
+        </aside>
 
-            <label className="portal-field">
-              <span>Password</span>
-              <span className="portal-password-wrap">
+        {/* RIGHT PANEL — Login form */}
+        <div className="portal-right">
+          <section className="portal-form-panel" aria-labelledby="portal-title">
+
+            <div className="portal-form-header">
+              <div className="portal-form-eyebrow">
+                <span className="portal-eyebrow-pip" aria-hidden="true" />
+                Institutional Portal
+              </div>
+              <h1 id="portal-title" className="portal-form-title">
+                Sign in to your account
+              </h1>
+              <p className="portal-form-intro">
+                Use your official college username and password to access the portal.
+              </p>
+            </div>
+
+            <form className="portal-auth-form" onSubmit={handleSubmit} noValidate>
+              <label className="portal-field">
+                <span className="portal-field-label">College Username</span>
                 <input
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(event) => { setPassword(event.target.value); setError('') }}
-                  placeholder="Enter your password"
+                  name="username"
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => { setUsername(e.target.value); setError('') }}
+                  placeholder="e.g. student.name"
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? 'portal-login-error' : undefined}
                 />
-                <button
-                  className="portal-password-toggle"
-                  type="button"
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                </button>
-              </span>
-            </label>
+              </label>
 
-            {error && (
-              <div id="portal-login-error" className="portal-error" role="alert" aria-live="polite">
-                {error}
+              <label className="portal-field">
+                <span className="portal-field-label">Password</span>
+                <span className="portal-password-wrap">
+                  <input
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setError('') }}
+                    placeholder="Enter your password"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'portal-login-error' : undefined}
+                  />
+                  <button
+                    className="portal-password-toggle"
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </span>
+              </label>
+
+              {error && (
+                <div id="portal-login-error" className="portal-error" role="alert" aria-live="polite">
+                  {error}
+                </div>
+              )}
+
+              <button className="portal-submit" type="submit" disabled={loading}>
+                <span>{loading ? 'Verifying…' : 'Sign in to portal'}</span>
+                {loading
+                  ? <span className="portal-spinner" aria-hidden="true" />
+                  : <ArrowRight size={16} aria-hidden="true" />
+                }
+              </button>
+            </form>
+
+            {/* Help footer */}
+            <div className="portal-form-footer">
+              <div className="portal-form-help">
+                <span>Forgot your credentials?</span>
+                <Link to="/contact">Contact the admissions office →</Link>
               </div>
-            )}
+              <p className="portal-form-note">
+                This portal is for enrolled students, teaching staff, and college administrators only.
+                If you are looking for public information, visit the{' '}
+                <Link to="/">college website</Link>.
+              </p>
+            </div>
 
-            <button className="portal-submit" type="submit" disabled={loading}>
-              <span>{loading ? 'Verifying credentials…' : `Sign in`}</span>
-              {loading ? <span className="portal-spinner" aria-hidden="true" /> : <ArrowRight size={17} />}
-            </button>
-          </form>
+          </section>
+        </div>
 
-          <p className="portal-terms">
-            By signing in, you agree to follow the college's <span>acceptable use</span> and
-            <span> data privacy</span> policies.
-          </p>
-
-          <div className="portal-support">
-            <span><ShieldCheck size={15} /> Secure institutional access</span>
-            <Link to="/contact">Having trouble signing in?</Link>
-          </div>
-        </section>
       </main>
 
-      <footer className="portal-footer">
-        <span>© {new Date().getFullYear()} Saint Anthony's Technical and Vocational College</span>
-        <span className="portal-footer-status"><i /> College portal</span>
-      </footer>
     </div>
   )
 }

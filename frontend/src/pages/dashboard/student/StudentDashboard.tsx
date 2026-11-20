@@ -103,8 +103,7 @@ export default function StudentDashboard() {
 
   const studentId = home?.student.id ?? null;
   const studentName = home?.student.full_name ?? "Student";
-
-  const eyebrow = home?.term ? `STUDENT PORTAL / ${home.term.academic_year}` : "STUDENT PORTAL";
+  const eyebrow = home?.term ? `Student Portal / ${home.term.academic_year}` : "Student Portal";
 
   const renderPage = () => {
     if (tab === "home") {
@@ -131,10 +130,18 @@ export default function StudentDashboard() {
       >
         <div className="sa-sidebar-header">
           <div className="sa-brand">
-            <div className="sa-crest">SA</div>
+            <div className="sa-crest">
+              <img
+                src="/images/college-logo.png"
+                alt="Saint Anthony's College"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </div>
             <div>
-              <strong>SAINT ANTHONY'S</strong>
-              <span>TECHNICAL COLLEGE</span>
+              <strong>Saint Anthony's</strong>
+              <span>Technical & Vocational College</span>
             </div>
           </div>
           <button
@@ -146,7 +153,7 @@ export default function StudentDashboard() {
             ×
           </button>
         </div>
-        <div className="sa-role">STUDENT PORTAL</div>
+        <div className="sa-role">Student Portal</div>
         <nav className="sa-nav">
           {NAV.map((item) => (
             <a
@@ -189,6 +196,22 @@ export default function StudentDashboard() {
           <div className="sa-breadcrumb">
             Student Portal <span>/</span> {TAB_LABELS[tab]}
           </div>
+          <div className="sa-topbar-end">
+            <span className="sa-topbar-name">{studentName}</span>
+            <span className="sa-topbar-role">
+              <span className="sa-topbar-role-pip" aria-hidden="true"></span>
+              Student
+            </span>
+            <a
+              href="/"
+              className="sa-topbar-collegelink"
+              aria-label="Go to college website"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ← College website
+            </a>
+          </div>
         </header>
 
         <section className="sa-content">
@@ -203,6 +226,7 @@ export default function StudentDashboard() {
               <h1>{TAB_LABELS[tab]}</h1>
               <p>{TAB_INTRO[tab]}</p>
             </div>
+            <div className="sa-heading-actions" />
           </div>
           {loading ? <SkeletonLoader /> : renderPage()}
         </section>

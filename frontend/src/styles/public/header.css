@@ -1,0 +1,493 @@
+/* =========================================================
+   Saint Anthony's Technical and Vocational College
+   Site chrome: top bar, sticky header, brand, navigation,
+   header actions and search strip.
+
+   Mobile-first. There is ONE layout switch, at 80rem (1280px):
+   the narrowest width at which the brand, all eight links and
+   the actions fit on a single row (English needs about 1,250px).
+   Below it the links live in a dropdown panel behind the menu
+   button. Keep the two `80rem` values in this file in sync.
+   ========================================================= */
+
+/* Shared container for the top bar, header and search strip so their
+   edges always line up. Wider than .wrap because the nav needs the room. */
+.chrome-wrap {
+  width: min(var(--chrome-measure), calc(100% - var(--gutter) * 2));
+  margin-inline: auto;
+}
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: var(--gutter);
+  z-index: 200;
+  padding: 0.625rem 1rem;
+  background: var(--navy);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  transform: translateY(-110%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ---------- Top bar (scrolls away with the page) ---------- */
+.topbar {
+  background: var(--navy);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  padding-block: 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.topline-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.topline-left,
+.topline-right {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.topline-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+a.topline-item:hover {
+  color: #ffffff;
+}
+
+.topline-divider {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Phone numbers only where the single-row bar has room for them */
+.topline-right {
+  display: none;
+}
+
+@media (min-width: 65rem) {
+  .topline-right {
+    display: flex;
+  }
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+  box-shadow: 0 1px 3px rgba(62, 39, 35, 0.04);
+}
+
+.header-main {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* ---------- Brand (also used, in light form, by the footer) ---------- */
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(62, 39, 35, 0.08);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.brand-name {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+/* May wrap onto two lines on the narrowest phones instead of pushing the menu button off-screen */
+.brand-sub {
+  font-family: var(--sans);
+  font-size: clamp(0.7rem, 1vw, 0.78125rem);
+  font-weight: 600;
+  color: var(--ink-secondary);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.brand-light .brand-name {
+  color: #ffffff;
+}
+
+.brand-light .brand-sub {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Navigation: dropdown panel (default) ---------- */
+.nav-area {
+  position: absolute;
+  top: 100%;
+  right: var(--gutter);
+  width: min(24rem, calc(100% - var(--gutter) * 2));
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(100dvh - var(--header-h) - var(--topline-h) - 1rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 16px 36px rgba(62, 39, 35, 0.16);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 180ms ease-out, transform var(--spring-t) var(--spring), visibility 0s linear var(--spring-t);
+}
+
+.nav-area.nav-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 180ms ease-out, transform var(--spring-t) var(--spring), visibility 0s;
+}
+
+.nav-area nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  border-radius: var(--r-sm);
+  transition: background-color var(--spring-t), color var(--spring-t);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--navy);
+  background: var(--surface-2);
+}
+
+.nav-link.active {
+  font-weight: 600;
+}
+
+/* ---------- Action controls ---------- */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* In the dropdown: stacked, full-width, 44px touch targets */
+.header-actions-menu {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.header-actions-menu .actions-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.header-actions-menu .icon-button,
+.header-actions-menu .language-button {
+  flex: 1;
+  width: auto;
+  height: 2.75rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.header-actions-menu .portal-button {
+  justify-content: center;
+  height: 2.75rem;
+}
+
+/* In the bar: compact, only shown on the desktop layout */
+.header-actions-bar {
+  display: none;
+}
+
+.icon-button {
+  background: transparent;
+  border: 1px solid var(--hairline);
+  color: var(--ink-secondary);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: background-color var(--spring-t), border-color var(--spring-t), color var(--spring-t);
+}
+
+.icon-button:hover {
+  background: var(--surface-2);
+  color: var(--navy);
+  border-color: var(--hairline-strong);
+}
+
+.language-button {
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  color: var(--navy);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.25rem;
+  padding: 0 0.625rem;
+  border-radius: var(--r-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: background-color var(--spring-t), border-color var(--spring-t);
+}
+
+.language-button:hover {
+  background: var(--surface-3);
+  border-color: var(--hairline-strong);
+}
+
+.portal-button {
+  background: var(--navy);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.25rem;
+  padding: 0 0.875rem;
+  border-radius: var(--r-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color var(--spring-t);
+}
+
+.portal-button:hover {
+  background: var(--navy-light);
+  color: #ffffff;
+}
+
+.mobile-menu {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  color: var(--navy);
+}
+
+/* ---------- Search strip (overlays the page; never shifts content) ---------- */
+.search-strip-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+  padding-block: 0.875rem;
+  box-shadow: 0 4px 12px rgba(62, 39, 35, 0.08);
+}
+
+.search-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-strip .search-icon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.search-strip input {
+  flex: 1;
+  min-width: 0;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  padding: 0.5rem 0.875rem;
+  font-size: 1rem; /* 16px prevents iOS zoom-on-focus */
+  color: var(--ink);
+}
+
+.search-strip input:focus {
+  border-color: var(--navy);
+}
+
+.text-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  background: var(--navy);
+  color: #ffffff;
+  border: 0;
+  border-radius: var(--r-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.text-button:hover {
+  background: var(--navy-light);
+}
+
+.search-close-btn {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--muted);
+}
+
+.search-close-btn:hover {
+  color: var(--navy);
+  background: var(--surface-2);
+}
+
+@media (max-width: 30rem) {
+  .search-strip .search-icon {
+    display: none;
+  }
+}
+
+/* ---------- Desktop layout: one row ---------- */
+@media (min-width: 80rem) {
+  .header-main {
+    gap: 1.5rem;
+  }
+
+  .nav-area {
+    position: static;
+    flex: 1;
+    width: auto;
+    margin-top: 0;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+    flex-direction: row;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
+  }
+
+  .nav-area nav {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .header-actions-menu,
+  .mobile-menu {
+    display: none;
+  }
+
+  .header-actions-bar {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-area,
+  .nav-area.nav-open {
+    transform: none;
+    transition: none;
+  }
+}

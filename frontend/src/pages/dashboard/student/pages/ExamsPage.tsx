@@ -42,8 +42,8 @@ export default function ExamsPage({ studentId, studentName }: Props) {
 
   return (
     <>
-      <section className="sa-panel sa-st-flush" aria-labelledby="overview-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="overview-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="overview-h">Exams</h3>
             <p>Scheduled by the registrar. Upcoming exams are listed first.</p>
@@ -55,28 +55,28 @@ export default function ExamsPage({ studentId, studentName }: Props) {
         ) : (
           <>
             {upcoming.length > 0 && (
-              <div className="sa-st-stack">
+              <div style={{ marginTop: "var(--sp-4)" }}>
                 {upcoming.map((exam) => (
-                  <article key={exam.id} className="sa-panel sa-st-padded">
-                    <div className="sa-st-examrow">
-                      <div>
-                        <h4>{exam.course_code} · {exam.assessment_title}</h4>
-                        <p>{assessmentTypeLabel(exam.assessment_type)} · Max score {exam.max_score}</p>
+                  <div key={exam.id} className="sa-exam-card">
+                    <div className="exam-info">
+                      <div className="exam-head">
+                        <span className="exam-code">{exam.course_code}</span>
+                        <span className="exam-title">{exam.assessment_title}</span>
                       </div>
-                      <div className="sa-st-exammeta">
-                        <span>{formatDate(exam.exam_date)}</span>
-                        <span>{formatTimeRange(exam.starts_at, exam.ends_at)}</span>
-                        <span>{exam.room || "Room TBA"}</span>
+                      <div className="exam-meta">
+                        {formatDate(exam.exam_date)} · {formatTimeRange(exam.starts_at, exam.ends_at)} ·
+                        {assessmentTypeLabel(exam.assessment_type)} · Max score {exam.max_score} ·
+                        {exam.room || "Room TBA"}
                       </div>
                     </div>
                     <span className={`sa-badge ${statusTone(exam.status)}`}>{exam.status}</span>
-                  </article>
+                  </div>
                 ))}
               </div>
             )}
             {postponed.length > 0 && (
-              <section className="sa-panel sa-st-padded" aria-labelledby="postponed-h">
-                <div className="sa-panel-heading sa-st-padded">
+              <section className="sa-card" aria-labelledby="postponed-h" style={{ marginTop: "var(--sp-4)" }}>
+                <div className="sa-card-heading">
                   <div><h3 id="postponed-h">Postponed</h3><p>Exams rescheduled by the college.</p></div>
                 </div>
                 <table className="sa-table sa-st-restable" role="region" aria-label="Postponed exams">
@@ -107,8 +107,8 @@ export default function ExamsPage({ studentId, studentName }: Props) {
         )}
       </section>
 
-      <section className="sa-panel sa-st-flush" aria-labelledby="all-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="all-h">
+        <div className="sa-card-heading">
           <div><h3 id="all-h">All scheduled exams</h3><p>{exams.length} exam{exams.length === 1 ? "" : "s"} found.</p></div>
         </div>
         {exams.length === 0 ? (

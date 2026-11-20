@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  BarChart3,
   BookOpenText,
   CalendarDays,
   ClipboardCheck,
@@ -144,12 +143,7 @@ export default function TeacherDashboard() {
     return () => { active = false; };
   }, [params.classId]);
 
-  const dashboardData = summary;
   const dashboardClasses = summary?.classes ?? [];
-  const currentClass = useMemo(() => {
-    if (selectedClassId) return dashboardClasses.find((cls) => cls.id === selectedClassId) ?? dashboardClasses[0] ?? null;
-    return dashboardClasses[0] ?? null;
-  }, [dashboardClasses, selectedClassId]);
 
   const handleSelectClass = (nextClassId: number) => {
     setSelectedClassId(nextClassId);

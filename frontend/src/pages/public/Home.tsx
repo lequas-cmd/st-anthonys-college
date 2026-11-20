@@ -1,17 +1,13 @@
 import React from 'react'
 import { apiRequest } from '../../services/api'
 import HomeContent, { type ProgramItem, type NewsItem, type EventItem, type AnnouncementItem } from './HomeContent'
+import { programs as fallbackPrograms, news as fallbackNews, events as fallbackEvents, announcements as fallbackAnnouncements } from '../../data/content'
 
 export default function Home() {
-
-  const [featuredPrograms, setFeaturedPrograms] = React.useState<ProgramItem[]>([])
-  const [featuredNews, setFeaturedNews] = React.useState<NewsItem[]>([])
-  const [featuredEvents, setFeaturedEvents] = React.useState<EventItem[]>([])
-  const [featuredAnnouncements, setFeaturedAnnouncements] = React.useState<AnnouncementItem[]>([])
-  const [showProgramDelayNotice, setShowProgramDelayNotice] = React.useState(false)
-  const [showAnnouncementDelayNotice, setShowAnnouncementDelayNotice] = React.useState(false)
-  const [showNewsDelayNotice, setShowNewsDelayNotice] = React.useState(false)
-  const [showEventDelayNotice, setShowEventDelayNotice] = React.useState(false)
+  const [featuredPrograms, setFeaturedPrograms] = React.useState<ProgramItem[]>(fallbackPrograms)
+  const [featuredNews, setFeaturedNews] = React.useState<NewsItem[]>(fallbackNews)
+  const [featuredEvents, setFeaturedEvents] = React.useState<EventItem[]>(fallbackEvents)
+  const [featuredAnnouncements, setFeaturedAnnouncements] = React.useState<AnnouncementItem[]>(fallbackAnnouncements)
 
   React.useEffect(() => {
     let active = true
@@ -19,41 +15,45 @@ export default function Home() {
     apiRequest<{ programs?: ProgramItem[] }>('/programs')
       .then((response) => {
         if (!active) return
-        setFeaturedPrograms(response.programs ?? [])
+        if (response.programs && response.programs.length > 0) {
+          setFeaturedPrograms(response.programs)
+        }
       })
       .catch(() => {
-        if (!active) return
-        setFeaturedPrograms([])
+        // Fallback already pre-populated from verified institutional data
       })
 
     apiRequest<{ news?: NewsItem[] }>('/news')
       .then((response) => {
         if (!active) return
-        setFeaturedNews(response.news ?? [])
+        if (response.news && response.news.length > 0) {
+          setFeaturedNews(response.news)
+        }
       })
       .catch(() => {
-        if (!active) return
-        setFeaturedNews([])
+        // Fallback pre-populated
       })
 
     apiRequest<{ events?: EventItem[] }>('/events')
       .then((response) => {
         if (!active) return
-        setFeaturedEvents(response.events ?? [])
+        if (response.events && response.events.length > 0) {
+          setFeaturedEvents(response.events)
+        }
       })
       .catch(() => {
-        if (!active) return
-        setFeaturedEvents([])
+        // Fallback pre-populated
       })
 
     apiRequest<{ announcements?: AnnouncementItem[] }>('/announcements')
       .then((response) => {
         if (!active) return
-        setFeaturedAnnouncements(response.announcements ?? [])
+        if (response.announcements && response.announcements.length > 0) {
+          setFeaturedAnnouncements(response.announcements)
+        }
       })
       .catch(() => {
-        if (!active) return
-        setFeaturedAnnouncements([])
+        // Fallback pre-populated
       })
 
     return () => {
@@ -61,90 +61,12 @@ export default function Home() {
     }
   }, [])
 
-  const previewPrograms = featuredPrograms.slice(0, 3)
-
-  const eventItems = React.useMemo(() => {
-    return [...featuredEvents]
-      .filter((item) => {
-        const eventDate = item.starts_at ? new Date(item.starts_at).getTime() : 0
-        return !eventDate || eventDate >= Date.now() - 1000 * 60 * 60 * 24 * 30
-      })
-      .sort((a, b) => {
-        const dateA = a.starts_at ? new Date(a.starts_at).getTime() : 0
-        const dateB = b.starts_at ? new Date(b.starts_at).getTime() : 0
-        return dateA - dateB
-      })
-      .slice(0, 4)
-  }, [featuredEvents])
-
-  React.useEffect(() => {
-    if (featuredPrograms.length > 0) {
-      setShowProgramDelayNotice(false)
-      return
-    }
-
-    const timer = window.setTimeout(() => {
-      setShowProgramDelayNotice(true)
-    }, 10000)
-
-    return () => window.clearTimeout(timer)
-  }, [featuredPrograms.length])
-
-  React.useEffect(() => {
-    if (featuredAnnouncements.length > 0) {
-      setShowAnnouncementDelayNotice(false)
-      return
-    }
-
-    const timer = window.setTimeout(() => {
-      setShowAnnouncementDelayNotice(true)
-    }, 10000)
-
-    return () => window.clearTimeout(timer)
-  }, [featuredAnnouncements.length])
-
-  React.useEffect(() => {
-    if (featuredNews.length > 0) {
-      setShowNewsDelayNotice(false)
-      return
-    }
-
-    const timer = window.setTimeout(() => {
-      setShowNewsDelayNotice(true)
-    }, 10000)
-
-    return () => window.clearTimeout(timer)
-  }, [featuredNews.length])
-
-  React.useEffect(() => {
-    if (eventItems.length > 0) {
-      setShowEventDelayNotice(false)
-      return
-    }
-
-    const timer = window.setTimeout(() => {
-      setShowEventDelayNotice(true)
-    }, 10000)
-
-    return () => window.clearTimeout(timer)
-  }, [eventItems.length])
-
-  const dataFetchNotice = 'Fetching data is taking longer than usual. Please check your connection and try again shortly.'
-
-
-
-
   return (
     <HomeContent
-      previewPrograms={previewPrograms}
+      previewPrograms={featuredPrograms.slice(0, 6)}
       featuredNews={featuredNews}
-      eventItems={eventItems}
-      featuredAnnouncements={featuredAnnouncements}
-      showProgramDelayNotice={showProgramDelayNotice}
-      showAnnouncementDelayNotice={showAnnouncementDelayNotice}
-      showNewsDelayNotice={showNewsDelayNotice}
-      showEventDelayNotice={showEventDelayNotice}
-      dataFetchNotice={dataFetchNotice}
+      eventItems={featuredEvents.slice(0, 4)}
+      featuredAnnouncements={featuredAnnouncements.slice(0, 3)}
     />
   )
 }

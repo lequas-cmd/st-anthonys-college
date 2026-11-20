@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
-import AdminDataTable, { Column } from "../components/AdminDataTable";
+import AdminDataTable from "../components/AdminDataTable";
 import AdminCrudModal, { CrudField } from "../components/AdminCrudModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import LoadingState from "../components/LoadingState";

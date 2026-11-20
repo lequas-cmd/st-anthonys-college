@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
-import AdminDataTable, { Column } from "../components/AdminDataTable";
-import AdminCrudModal, { CrudField } from "../components/AdminCrudModal";
+import AdminDataTable from "../components/AdminDataTable";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
 
 export default function SettingsPage({ data, loading: parentLoading }: { data: any; loading: boolean }) {
   const [tab, setTab] = useState<"profile" | "academic" | "terms" | "audit">("profile");
-  const [site, setSite] = useState<any[]>([]);
-  const [academic, setAcademic] = useState<any[]>([]);
+  const [, setSite] = useState<any[]>([]);
+  const [, setAcademic] = useState<any[]>([]);
   const [years, setYears] = useState<any[]>([]);
   const [semesters, setSemesters] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);

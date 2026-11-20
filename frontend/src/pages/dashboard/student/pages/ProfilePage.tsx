@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { LogOut } from "lucide-react";
 import "../../../../styles/dashboard/shared.css";
 import "../../../../styles/dashboard/student.css";
 import { apiRequest } from "../../../../services/api";
 import SkeletonLoader from "../../../../components/SkeletonLoader";
-import { LogOut } from "lucide-react";
 import { formatDate, initialsOf } from "../utils/studentPortal";
 
 type Props = {
@@ -108,18 +108,18 @@ export default function ProfilePage({ studentId, studentName }: Props) {
 
   return (
     <>
-      <section className="sa-panel sa-st-flush" aria-labelledby="details-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card sa-card-hover" aria-labelledby="details-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="details-h">Profile</h3>
             <p>Your college details. Only phone and email can be edited here.</p>
           </div>
         </div>
 
-        <div className="sa-student-hero sa-st-hero" aria-label="Student profile">
+        <div className="sa-student-hero sa-card sa-card-hover" aria-label="Student profile">
           <div className="sa-student-photo" aria-hidden="true">{initialsOf(p)}</div>
           <div className="sa-student-intro">
-            <span className="sa-chip sa-chip-light">{String(p.status || "active").toUpperCase()}</span>
+            <span className="sa-chip">{String(p.status || "active").toUpperCase()}</span>
             <h2>{p.full_name}</h2>
             <p>{[p.program, p.level_number ? `Level ${p.level_number}` : null].filter(Boolean).join(" · ") || "Program not assigned"}</p>
             <div className="sa-student-meta">
@@ -241,15 +241,15 @@ export default function ProfilePage({ studentId, studentName }: Props) {
           </tbody>
         </table>
 
-        <p className="sa-st-footnote sa-st-padded">
+        <p className="sa-st-note">
           Corrections to your name, program, department or other official details cannot be made here — please contact
-          the registrar’s office to request those changes.
+          the registrar's office to request those changes.
         </p>
       </section>
 
       {editable.includes("password") && (
-        <section className="sa-panel sa-st-flush" aria-labelledby="password-h">
-          <div className="sa-panel-heading sa-st-padded">
+        <section className="sa-card sa-card-hover" aria-labelledby="password-h">
+          <div className="sa-card-heading">
             <div>
               <h3 id="password-h">Change password</h3>
               <p>Minimum 8 characters.</p>
@@ -287,8 +287,8 @@ export default function ProfilePage({ studentId, studentName }: Props) {
         </div>
       )}
 
-      <section className="sa-panel sa-st-flush" aria-labelledby="logout-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card sa-card-hover" aria-labelledby="logout-h">
+        <div className="sa-card-heading">
           <div><h3 id="logout-h">Account</h3><p>Sign out of the student portal.</p></div>
         </div>
         <button type="button" className="sa-logout-btn" onClick={() => {

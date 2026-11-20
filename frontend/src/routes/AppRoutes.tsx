@@ -22,7 +22,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import { getLocaleFromPathname, getLocaleAwarePath } from '../i18n/locale';
 import { messages } from '../i18n/messages';
 
-function SimpleInfo({ title }: { title: string }) {
+function SimpleInfo({ title, pending = false }: { title?: string; pending?: boolean }) {
   const location = useLocation();
   const locale = getLocaleFromPathname(location.pathname);
   const copy = messages[locale].notFound;
@@ -30,9 +30,9 @@ function SimpleInfo({ title }: { title: string }) {
   return (
     <Layout>
       <main>
-        <PageIntro eyebrow="College information" title={title || copy.title} description={copy.description} />
+        <PageIntro eyebrow="College information" title={title || copy.title} description={pending ? copy.pending : copy.description} />
         <section className="section wrap article-body">
-          <p>{copy.description}</p>
+          <p>{pending ? copy.pending : copy.description}</p>
         </section>
       </main>
     </Layout>
@@ -55,9 +55,9 @@ const publicRoutes = [
   { path: '/resources', element: <Resources /> },
   { path: '/contact', element: <Contact /> },
   { path: '/search', element: <SearchPage /> },
-  { path: '/privacy', element: <SimpleInfo title="Privacy policy" /> },
-  { path: '/accessibility', element: <SimpleInfo title="Accessibility" /> },
-  { path: '*', element: <SimpleInfo title="Page not found" /> },
+  { path: '/privacy', element: <SimpleInfo title="Privacy policy" pending /> },
+  { path: '/accessibility', element: <SimpleInfo title="Accessibility" pending /> },
+  { path: '*', element: <SimpleInfo /> },
 ];
 
 export default function App() {

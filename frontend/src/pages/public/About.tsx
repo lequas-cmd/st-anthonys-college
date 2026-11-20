@@ -1,246 +1,273 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import React from 'react'
+import { ArrowRight, Award, CheckCircle2, HeartHandshake, ShieldCheck, Users, Wrench } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { Layout, Eyebrow, PageIntro, SectionHeading } from '../../components/ui'
 import { photos, leadershipMembers } from '../../data/content'
 import { getLocaleAwarePath, getLocaleFromPathname } from '../../i18n/locale'
 import { messages } from '../../i18n/messages'
-
-const galleryItems = [
-  {
-    id: 'workshop',
-    label: 'Workshop',
-    title: 'Hands-on learning in action',
-    description: 'Students build confidence through guided practice, real tools, and direct problem-solving in active learning spaces.',
-    image: photos.workshop,
-  },
-  {
-    id: 'students',
-    label: 'Student life',
-    title: 'A community of learning',
-    description: 'Collaboration, support, and shared purpose help students grow both academically and personally.',
-    image: photos.students,
-  },
-  {
-    id: 'computer',
-    label: 'Technology',
-    title: 'Skills for the modern workplace',
-    description: 'Practical instruction in digital and technical skills helps learners adapt to evolving industry expectations.',
-    image: photos.computer,
-  },
-  {
-    id: 'solar',
-    label: 'Innovation',
-    title: 'Sustainability and future-ready training',
-    description: 'New learning pathways connect technical education with emerging fields such as solar and renewable energy.',
-    image: photos.solar,
-  },
-  {
-    id: 'construction',
-    label: 'Campus',
-    title: 'Spaces designed for practice',
-    description: 'Learning environments are shaped to support demonstrations, cooperative work, and practical training.',
-    image: photos.construction,
-  },
-]
-
-const localeGalleryLabels = {
-  en: {
-    workshop: 'Workshop',
-    studentLife: 'Student life',
-    technology: 'Technology',
-    innovation: 'Innovation',
-    campus: 'Campus',
-  },
-  am: {
-    workshop: 'ሥራ ቤት',
-    studentLife: 'የተማሪ ሕይወት',
-    technology: 'ቴክኖሎጂ',
-    innovation: 'ፈጠራ',
-    campus: 'ካምፓስ',
-  },
-} as const;
+import churchLogo from '../../assets/images/church-logo.png'
+import crsLogo from '../../assets/images/crs-logo.png'
 
 export default function About() {
   const location = useLocation();
   const locale = getLocaleFromPathname(location.pathname);
   const copy = messages[locale].pages.about;
-  const galleryLabels = localeGalleryLabels[locale];
-  const localizedGalleryItems = galleryItems.map((item) => ({
-    ...item,
-    label: galleryLabels[item.id === 'workshop' ? 'workshop' : item.id === 'students' ? 'studentLife' : item.id === 'computer' ? 'technology' : item.id === 'solar' ? 'innovation' : 'campus'],
-  }));
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [dragOffset, setDragOffset] = useState(0)
-  const dragStartX = useRef<number | null>(null)
-
-  const activeItem = localizedGalleryItems[activeIndex]
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setActiveIndex((current) => (current + 1) % localizedGalleryItems.length)
-    }, 5000)
-
-    return () => window.clearTimeout(timeoutId)
-  }, [activeIndex])
-
-  const goToIndex = (index: number) => {
-    setActiveIndex((index + localizedGalleryItems.length) % localizedGalleryItems.length)
-    setDragOffset(0)
-  }
-
-  const goNext = () => goToIndex(activeIndex + 1)
-  const goPrev = () => goToIndex(activeIndex - 1)
-
-  const getCardStyle = (index: number) => {
-    const relativeIndex = index - activeIndex
-    const absIndex = Math.abs(relativeIndex)
-    const translateX = relativeIndex * 190 + dragOffset * 0.18
-    const translateY = absIndex === 0 ? 0 : absIndex === 1 ? 18 : 32
-    const scale = absIndex === 0 ? 1 : absIndex === 1 ? 0.82 : 0.68
-    const rotateY = absIndex === 0 ? 0 : relativeIndex * -28
-    const opacity = absIndex > 2 ? 0 : absIndex === 0 ? 1 : absIndex === 1 ? 0.84 : 0.38
-    const zIndex = 10 - absIndex
-
-    return {
-      opacity,
-      zIndex,
-      transform: `translateX(-50%) translate3d(${translateX}px, ${translateY}px, 0) scale(${scale}) rotateY(${rotateY}deg)`,
-    }
-  }
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    dragStartX.current = event.clientX
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (dragStartX.current === null) return
-    setDragOffset(event.clientX - dragStartX.current)
-  }
-
-  const handlePointerEnd = () => {
-    if (dragOffset > 80) {
-      goPrev()
-    } else if (dragOffset < -80) {
-      goNext()
-    } else {
-      setDragOffset(0)
-    }
-
-    dragStartX.current = null
-  }
 
   return (
     <Layout>
-      <main>
-        <PageIntro eyebrow={copy.eyebrow} title={copy.title} description={copy.description} />
-        <section className="split-feature wrap">
-          <img src={photos.students} alt="Students collaborating in an educational setting" />
-          <div>
-            <Eyebrow>{copy.storyEyebrow}</Eyebrow>
-            <h2>{copy.storyTitle}</h2>
-               <p>{copy.storyBody} <br /> <br />
-                {copy.storySupport}
-            </p>
-          </div>
-        </section>
+      <main className="about-page">
+        {/* 1. Institutional Hero */}
+        <PageIntro
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.description}
+          badge="TVET Emdibir · Ethiopia"
+        />
 
-        <section className="section wrap gallery-section">
-          <SectionHeading eyebrow={copy.historyEyebrow} title={copy.historyTitle} />
-
-          <div className="photo-gallery-carousel">
-            <div className="photo-gallery-head">
-              <span className="photo-gallery-pill">{activeItem.label}</span>
-              <div className="photo-gallery-nav">
-                <button type="button" className="photo-gallery-arrow" onClick={goPrev} aria-label="Previous image">
-                  <span>‹</span>
-                </button>
-                <button type="button" className="photo-gallery-arrow" onClick={goNext} aria-label="Next image">
-                  <span>›</span>
-                </button>
+        {/* 2. Our Story (Image & Text Composition) */}
+        <section className="section wrap about-story-section">
+          <div className="about-story-grid">
+            <div className="about-story-media">
+              <img
+                src={photos.students}
+                alt="Students collaborating in technical education in Emdibir"
+                className="about-story-img"
+              />
+              <div className="about-story-badge">
+                <span className="badge-title">Community Roots</span>
+                <p>Emdibir, Gurage Zone · Empowering youth through technical skills since foundation.</p>
               </div>
             </div>
 
-            <div
-              className="photo-gallery-stage"
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerEnd}
-              onPointerLeave={handlePointerEnd}
-            >
-              {localizedGalleryItems.map((item, index) => (
-                <article
-                  key={item.id}
-                  className={`photo-gallery-card ${index === activeIndex ? 'is-active' : ''}`}
-                  aria-hidden={index !== activeIndex}
-                  style={getCardStyle(index)}
-                >
-                  <img src={item.image} alt={item.title} />
-                 
-                </article>
-              ))}
-            </div>
-
-            <div className="photo-gallery-footer">
-              <div className="photo-gallery-text">
-                <span>{activeItem.label}</span>
-                <h3>{activeItem.title}</h3>
+            <div className="about-story-copy">
+              <Eyebrow>{copy.storyEyebrow}</Eyebrow>
+              <h2>{copy.storyTitle}</h2>
+              <div className="editorial-prose">
+                <p>{copy.storyBody}</p>
+                <p>{copy.storySupport}</p>
               </div>
-              <p>{activeItem.description}</p>
-            </div>
 
-            <div className="photo-gallery-dots" aria-label="Gallery navigation">
-              {localizedGalleryItems.map((item, index) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`photo-gallery-dot ${activeIndex === index ? 'is-active' : ''}`}
-                  onClick={() => goToIndex(index)}
-                  aria-label={`View ${item.title}`}
-                />
-              ))}
+              <div className="story-highlights-list">
+                <div className="highlight-item">
+                  <CheckCircle2 size={18} className="highlight-icon" aria-hidden="true" />
+                  <span>Serving all students regardless of religion, gender, or background.</span>
+                </div>
+                <div className="highlight-item">
+                  <CheckCircle2 size={18} className="highlight-icon" aria-hidden="true" />
+                  <span>Fully aligned with Ethiopian National TVET Occupational Standards.</span>
+                </div>
+                <div className="highlight-item">
+                  <CheckCircle2 size={18} className="highlight-icon" aria-hidden="true" />
+                  <span>Supported by Catholic Church partners and Catholic Relief Services (CRS).</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="section muted-section">
+        {/* 3. Mission and Vision */}
+        <section className="section about-mission-section">
           <div className="wrap">
-            <SectionHeading eyebrow={copy.valuesEyebrow} title={copy.valuesTitle} />
-            <div className="three-columns">
-              <article><span className="number">01</span><h3>{copy.values.mission.title}</h3><p>{copy.values.mission.body}</p></article>
-              <article><span className="number">02</span><h3>{copy.values.vision.title}</h3><p>{copy.values.vision.body}</p></article>
-              <article><span className="number">03</span><h3>{copy.values.values.title}</h3><p>{copy.values.values.body}</p></article>
+            <div className="mission-intro-header">
+              <Eyebrow>{copy.missionEyebrow}</Eyebrow>
+              <h2>{copy.missionTitle}</h2>
+            </div>
+
+            <div className="mission-vision-grid">
+              <div className="mission-card">
+                <span className="mission-tag">Institutional Mission</span>
+                <h3>Educating for Dignity &amp; Self-Reliance</h3>
+                <p>{copy.missionText}</p>
+              </div>
+
+              <div className="mission-card vision-card">
+                <span className="mission-tag">Institutional Vision</span>
+                <h3>A Beacon of TVET Excellence in Ethiopia</h3>
+                <p>{copy.visionText}</p>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="leadership-section">
-          <div className="wrap">
-            <SectionHeading eyebrow={copy.leadershipEyebrow} title={copy.leadershipTitle} />
-            <div className="leadership-grid">
-              {leadershipMembers.map((member, index) => (
-                <article key={member.name} className={`leadership-card ${index === 0 ? 'featured' : ''} ${index % 2 === 1 ? 'alternate' : ''}`}>
-                  <div className="leadership-image-wrap"><img src={member.image} alt={member.name} /></div>
-                  <div className="leadership-body">
-                    <span className="leadership-role">{member.role}</span>
-                    <h3>{member.name}</h3>
-                    <p className="leadership-message">“{member.message}”</p>
-                  </div>
-                </article>
-              ))}
+        {/* 4. Institutional Values */}
+        <section className="section wrap about-values-section">
+          <SectionHeading
+            eyebrow="Core Principles"
+            title="Institutional Values that Guide Our Community"
+            lead="Our education is founded on mutual respect, personal integrity, and the shared dignity of manual and technical work."
+          />
+
+          <div className="values-cards-grid">
+            <div className="value-card">
+              <div className="value-icon-box"><Award size={20} /></div>
+              <h3>{copy.values.dignity.title}</h3>
+              <p>{copy.values.dignity.desc}</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon-box"><Wrench size={20} /></div>
+              <h3>{copy.values.competence.title}</h3>
+              <p>{copy.values.competence.desc}</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon-box"><HeartHandshake size={20} /></div>
+              <h3>{copy.values.solidarity.title}</h3>
+              <p>{copy.values.solidarity.desc}</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon-box"><ShieldCheck size={20} /></div>
+              <h3>{copy.values.integrity.title}</h3>
+              <p>{copy.values.integrity.desc}</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon-box"><Users size={20} /></div>
+              <h3>{copy.values.inclusion.title}</h3>
+              <p>{copy.values.inclusion.desc}</p>
             </div>
           </div>
         </section>
 
-        <section className="split-feature wrap reverse">
-          <div>
-            <Eyebrow>{copy.partnershipEyebrow}</Eyebrow>
-            <h2>{copy.partnershipTitle}</h2>
-            <p>{copy.partnershipBody}</p>
-            <a className="inline-link" href={getLocaleAwarePath('/contact', locale)}>{copy.gallery.campus === 'ካምፓስ' ? 'ኮሌጁን ያግኙ' : 'Contact the college'} <ArrowRight size={15}/></a>
+        {/* 5. Our Approach to Education */}
+        <section className="section about-approach-section">
+          <div className="wrap about-approach-grid">
+            <div className="approach-copy">
+              <Eyebrow>{copy.approachEyebrow}</Eyebrow>
+              <h2>{copy.approachTitle}</h2>
+              <div className="editorial-prose">
+                <p>{copy.approachBody}</p>
+              </div>
+
+              <div className="approach-ratios">
+                <div className="ratio-box">
+                  <span className="ratio-num">70%</span>
+                  <strong>Supervised Workshop Practice</strong>
+                  <p>Hands-on diagnostics, machinery operation, circuit wiring, and fabrication bays.</p>
+                </div>
+                <div className="ratio-box">
+                  <span className="ratio-num">30%</span>
+                  <strong>Occupational Theory &amp; Safety</strong>
+                  <p>Engineering math, blueprint reading, occupational safety regulations, and trade science.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="approach-media">
+              <img
+                src={photos.workshop}
+                alt="Student practicing arc welding under instructor supervision"
+                className="approach-img"
+              />
+              <div className="approach-caption">
+                <span>Workshop Learning Culture · Emdibir Campus</span>
+              </div>
+            </div>
           </div>
-          <img src={photos.classroom} alt="Classroom learning environment" />
+        </section>
+
+        {/* 6. Leadership & Academic Governance */}
+        <section className="section wrap about-leadership-section">
+          <SectionHeading
+            eyebrow={copy.leadershipEyebrow}
+            title={copy.leadershipTitle}
+            lead="Our academic leadership brings decades of engineering experience, educational dedication, and community leadership."
+          />
+
+          <div className="leadership-cards-grid">
+            {leadershipMembers.map((member) => (
+              <article key={member.name} className="leadership-card">
+                <div className="leadership-photo-wrap">
+                  <img src={member.image} alt={member.name} loading="lazy" />
+                  <span className="leadership-dept">{member.department || 'Academic Leadership'}</span>
+                </div>
+                <div className="leadership-card-body">
+                  <span className="leadership-role">{member.role}</span>
+                  <h3 className="leadership-name">{member.name}</h3>
+                  <blockquote className="leadership-quote">“{member.message}”</blockquote>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* 7. Community Commitment & Development Impact */}
+        <section className="section about-community-commitment">
+          <div className="wrap community-commitment-grid">
+            <div className="commitment-media">
+              <img
+                src={photos.classroom}
+                alt="Community consultation and student workshop in session"
+                className="commitment-img"
+              />
+            </div>
+            <div className="commitment-copy">
+              <Eyebrow>{copy.communityEyebrow}</Eyebrow>
+              <h2>{copy.communityTitle}</h2>
+              <div className="editorial-prose">
+                <p>{copy.communityBody}</p>
+              </div>
+              <div className="commitment-facts">
+                <div className="commitment-fact-item">
+                  <strong>Local Economic Reinvestment</strong>
+                  <p>Graduates establish repair workshops, metal fabrication shops, and construction services in Gurage Zone.</p>
+                </div>
+                <div className="commitment-fact-item">
+                  <strong>Community Skills Outreach</strong>
+                  <p>Annual repair clinics, technical advice, and solar energy installations supporting local families.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 8. Institutional Partners */}
+        <section className="section wrap about-partners-section">
+          <div className="partners-box-container">
+            <div className="partners-box-header">
+              <Eyebrow>{copy.partnerEyebrow}</Eyebrow>
+              <h2>{copy.partnerTitle}</h2>
+              <p>{copy.partnerBody}</p>
+            </div>
+
+            <div className="partners-detail-grid">
+              <div className="partner-detail-card">
+                <div className="partner-detail-logo">
+                  <img src={churchLogo} alt="Ethiopian Catholic Church Logo" />
+                </div>
+                <div>
+                  <h3>Ethiopian Catholic Church</h3>
+                  <p>Founding pastoral partner ensuring strong moral values, human dignity, social service outreach, and long-term community presence in Emdibir.</p>
+                </div>
+              </div>
+
+              <div className="partner-detail-card">
+                <div className="partner-detail-logo">
+                  <img src={crsLogo} alt="Catholic Relief Services Logo" />
+                </div>
+                <div>
+                  <h3>Catholic Relief Services (CRS)</h3>
+                  <p>International development partner supporting modern training equipment, instructor professional development, facility enhancement, and student scholarships.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 9. Closing CTA */}
+        <section className="section wrap about-cta-strip">
+          <div className="about-cta-card">
+            <div>
+              <h2>{copy.closingCta}</h2>
+              <p>Explore our 10 certified technical departments or learn how to apply for the upcoming academic intake.</p>
+            </div>
+            <div className="cta-actions">
+              <a href={getLocaleAwarePath('/programs', locale)} className="button button-navy">
+                <span>View Programs</span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </a>
+              <a href={getLocaleAwarePath('/contact', locale)} className="button button-outline">
+                <span>Contact Admissions</span>
+              </a>
+            </div>
+          </div>
         </section>
       </main>
     </Layout>

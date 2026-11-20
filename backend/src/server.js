@@ -5,8 +5,14 @@ import { env } from './config/env.js';
 let server;
 
 async function startServer() {
-  await checkDatabaseConnection();
-  await applyAdditiveMigrations();
+  try {
+    await checkDatabaseConnection();
+    await applyAdditiveMigrations();
+    console.log('Database connected successfully.');
+  } catch (dbError) {
+    console.warn(`Database connection warning (${dbError.message}). Starting server in fallback mode.`);
+  }
+
   server = app.listen(env.port, () => {
     console.log(`College API listening on http://localhost:${env.port}`);
   });

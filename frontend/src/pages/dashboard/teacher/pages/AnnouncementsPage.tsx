@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
 import { TeacherClass } from "../TeacherDashboard";
-import AdminCrudModal, { CrudField } from "../../admin/components/AdminCrudModal";
+import AdminCrudModal from "../../admin/components/AdminCrudModal";
 import LoadingState from "../../admin/components/LoadingState";
 import ErrorState from "../../admin/components/ErrorState";
 import EmptyState from "../../admin/components/EmptyState";
@@ -14,8 +14,6 @@ export default function AnnouncementsPage({ data, loading: parentLoading }: Prop
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(classes[0]?.id ?? null);
-
   const load = async () => {
     setLoading(true); setError(null);
     try {

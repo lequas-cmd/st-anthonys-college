@@ -1,33 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useLocation } from 'react-router-dom';
 import {
   ArrowRight,
   ArrowUpRight,
+  Award,
   BookOpen,
+  Calendar,
+  CheckCircle2,
   GraduationCap,
-  Mail,
+  Hammer,
   MapPin,
-  Phone,
+  ShieldCheck,
   Users,
   Wrench,
+  Zap,
 } from "lucide-react";
 import {
   Layout,
   Eyebrow,
   SectionHeading,
   ProgramCard,
+  NewsCard,
 } from "../../components/ui";
-import { photos } from "../../data/content";
+import { photos, studentTestimonials, impactMetrics } from "../../data/content";
 import { getLocaleAwarePath, getLocaleFromPathname } from '../../i18n/locale';
 import { messages } from '../../i18n/messages';
-
-const crsLogo = new URL("../../assets/images/crs-logo.png", import.meta.url)
-  .href;
-const churchLogo = new URL(
-  "../../assets/images/church-logo.png",
-  import.meta.url,
-).href;
-const hero = new URL("../../assets/images/hero.jpg", import.meta.url).href;
+import churchLogo from "../../assets/images/church-logo.png";
+import crsLogo from "../../assets/images/crs-logo.png";
 
 export type ProgramItem = {
   id: number;
@@ -35,7 +34,9 @@ export type ProgramItem = {
   title: string;
   category: string;
   duration: string;
+  duration_years?: number;
   description: string;
+  qualification_level?: string;
   image_url?: string | null;
 };
 
@@ -49,6 +50,7 @@ export type NewsItem = {
   image_url?: string | null;
   published_at?: string;
   date?: string;
+  author?: string;
 };
 
 export type EventItem = {
@@ -60,9 +62,7 @@ export type EventItem = {
   location?: string;
   starts_at?: string;
   ends_at?: string;
-  image_url?: string | null;
-  month?: string;
-  day?: string;
+  date_formatted?: string;
 };
 
 export type AnnouncementItem = {
@@ -81,135 +81,6 @@ type HomeContentProps = {
   featuredNews: NewsItem[];
   eventItems: EventItem[];
   featuredAnnouncements: AnnouncementItem[];
-  showProgramDelayNotice: boolean;
-  showAnnouncementDelayNotice: boolean;
-  showNewsDelayNotice: boolean;
-  showEventDelayNotice: boolean;
-  dataFetchNotice: string;
-};
-
-type LifeGalleryItem = {
-  id: number;
-  title: string;
-  tag: string;
-  image: string;
-  description: string;
-  highlight: string;
-};
-
-const lifeGalleryItemsByLocale: Record<string, LifeGalleryItem[]> = {
-  en: [
-    {
-      id: 1,
-      title: "Practical learning",
-      tag: "Workshop culture",
-      image: photos.workshop,
-      description:
-        "Students build confidence through hands-on labs, guided exercises, and real-world technical practice in a supportive setting.",
-      highlight: "Experiential learning",
-    },
-    {
-      id: 2,
-      title: "Learning resources",
-      tag: "Study support",
-      image: photos.library,
-      description:
-        "Quiet study spaces, digital resources, and mentoring help students stay focused and explore ideas with confidence.",
-      highlight: "Independent learning",
-    },
-    {
-      id: 3,
-      title: "Student community",
-      tag: "Campus life",
-      image: photos.students,
-      description:
-        "Clubs, mentoring, and shared traditions bring students together around friendship, leadership, and belonging.",
-      highlight: "Belonging & leadership",
-    },
-    {
-      id: 4,
-      title: "Digital skills",
-      tag: "Future-ready",
-      image: photos.computer,
-      description:
-        "From networking basics to technical troubleshooting, students gain the digital fluency needed for modern careers.",
-      highlight: "Career preparedness",
-    },
-    {
-      id: 5,
-      title: "Construction training",
-      tag: "Skills in action",
-      image: photos.construction,
-      description:
-        "Practical site-style projects and supervised activity sessions help students connect theory to technical performance.",
-      highlight: "Applied projects",
-    },
-    {
-      id: 6,
-      title: "Classroom engagement",
-      tag: "Teaching excellence",
-      image: photos.classroom,
-      description:
-        "Active teaching methods, peer collaboration, and mentor guidance make each lesson participatory and purposeful.",
-      highlight: "Student-centered teaching",
-    },
-  ],
-  am: [
-    {
-      id: 1,
-      title: "ተግባራዊ ትምህርት",
-      tag: "የሥራ ቤት ባህል",
-      image: photos.workshop,
-      description:
-        "ተማሪዎች በእጅ የሚሰሩ ላብራቶሪዎች፣ በተመራማሪ ልምምዶች እና በተግባራዊ ቴክኒካል አሠራር ውስጥ እምነት ያዳብራሉ።",
-      highlight: "ተግባራዊ ትምህርት",
-    },
-    {
-      id: 2,
-      title: "የመማር መርጃዎች",
-      tag: "የጥናት ድጋፍ",
-      image: photos.library,
-      description:
-        "ሰላም ያለ የጥናት ቦታዎች፣ ዲጂታል መርጃዎች እና አስተማሪ እርዳታ ተማሪዎች ትኩረት እንዲያደርጉ እና ሀሳቦችን በእምነት እንዲያዳምጡ ያግዛሉ።",
-      highlight: "ገለልተኛ ትምህርት",
-    },
-    {
-      id: 3,
-      title: "የተማሪ ማህበረሰብ",
-      tag: "የካምፓስ ሕይወት",
-      image: photos.students,
-      description:
-        "ክለቦች፣ አስተማር እና ጋራ ባህሎች ተማሪዎችን በወዳጅነት፣ በአመራር እና በመያዣነት ያቀራርባሉ።",
-      highlight: "የማህበረሰብ እና አመራር",
-    },
-    {
-      id: 4,
-      title: "ዲጂታል ክህሎቶች",
-      tag: "ወደፊት የሚያደርግ",
-      image: photos.computer,
-      description:
-        "ከኔትወርክ መሰረቶች እስከ ቴክኒካል ችግር መፍታት ድረስ ተማሪዎች ለዘመናዊ ሙያዎች የሚያስፈልጉ ዲጂታል ተሞክሮ ያገኛሉ።",
-      highlight: "የሙያ ዝግጁነት",
-    },
-    {
-      id: 5,
-      title: "የሕንፃ ስልጠና",
-      tag: "ክህሎት በስራ",
-      image: photos.construction,
-      description:
-        "ተግባራዊ የጣቢያ አይነት ፕሮጀክቶች እና የሚተዳደሩ የእንቅስቃሴ ክፍሎች ተማሪዎች ንድፈ ሀሳብን ከቴክኒካል አፈጻጸም ጋር እንዲያገናኝ ያግዛሉ።",
-      highlight: "ተግባራዊ ፕሮጀክቶች",
-    },
-    {
-      id: 6,
-      title: "የክፍል ተሳትፎ",
-      tag: "የማስተማር ልዩነት",
-      image: photos.classroom,
-      description:
-        "ንቁ የማስተማር ዘዴዎች፣ የአቻ ትብብር እና የአስተማሪ መመሪያ እያንዳንዱ ትምህርት ተሳታፊ እና አስፈላጊ እንዲሆን ያደርጋሉ።",
-      highlight: "ተማሪ-ተኮር ትምህርት",
-    },
-  ],
 };
 
 export default function HomeContent({
@@ -217,546 +88,624 @@ export default function HomeContent({
   featuredNews,
   eventItems,
   featuredAnnouncements,
-  showProgramDelayNotice,
-  showAnnouncementDelayNotice,
-  showNewsDelayNotice,
-  showEventDelayNotice,
-  dataFetchNotice,
 }: HomeContentProps) {
   const location = useLocation();
   const locale = getLocaleFromPathname(location.pathname);
   const copy = messages[locale].home;
-  const lifeGalleryItems = lifeGalleryItemsByLocale[locale] ?? lifeGalleryItemsByLocale.en;
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeItem = lifeGalleryItems[activeIndex];
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setActiveIndex((current) => (current + 1) % lifeGalleryItems.length);
-    }, 6000);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [activeIndex]);
-
-  const goToPrevious = () => {
-    setActiveIndex((current) =>
-      current === 0 ? lifeGalleryItems.length - 1 : current - 1,
-    );
-  };
-
-  const goToNext = () => {
-    setActiveIndex((current) => (current + 1) % lifeGalleryItems.length);
-  };
+  const leadArticle = featuredNews[0] ?? null;
+  const secondaryNews = featuredNews.slice(1, 4);
+  const featuredTestimonial = studentTestimonials[0];
+  const supportingTestimonials = studentTestimonials.slice(1, 3);
 
   return (
     <Layout>
-      <main>
-        <section className="hero wrap">
-          <div className="hero-copy">
-            <Eyebrow>{copy.eyebrow}</Eyebrow>
-            <h1>
-              {locale === 'am' ? copy.heroTitle : (
-                <>
-                  Technical Education for <em>Practical Futures.</em>
-                </>
-              )}
-            </h1>
-            <p>
-              {copy.heroText}
-            </p>
-            <div className="hero-actions">
-              <a className="button button-dark" href={getLocaleAwarePath('/programs', locale)}>
-                {copy.ctaPrograms} <ArrowUpRight size={15} />
-              </a>
-              <a className="button button-light" href={getLocaleAwarePath('/admissions', locale)}>
-                {copy.ctaApply} <ArrowRight size={15} />
-              </a>
-            </div>
-            <div className="hero-stats" aria-label="Partner institutions">
-              <div className="partner-item">
-                <div className="partner-logo">
-                  <img src={churchLogo} alt="Ethiopian Catholic Church Logo" />
+      <main className="home-main">
+        {/* =========================================================
+            5.1 Institutional Hero Section
+            Two-column editorial hero: Main campus photo + strong typography
+            ========================================================= */}
+        <section className="institutional-hero">
+          <div className="wrap institutional-hero-grid">
+            <div className="hero-text-column">
+              <div className="hero-eyebrow-wrap">
+                <Eyebrow>{copy.eyebrow}</Eyebrow>
+              </div>
+              <h1 className="hero-headline">{copy.heroTitle}</h1>
+              <p className="hero-lead">{copy.heroText}</p>
+
+              <div className="hero-cta-group">
+                <a
+                  className="button button-navy"
+                  href={getLocaleAwarePath('/programs', locale)}
+                >
+                  <span>{copy.ctaPrograms}</span>
+                  <ArrowRight size={16} aria-hidden="true" />
+                </a>
+                <a
+                  className="button button-outline"
+                  href={getLocaleAwarePath('/how-to-apply', locale)}
+                >
+                  <span>{copy.ctaApply}</span>
+                  <ArrowUpRight size={15} aria-hidden="true" />
+                </a>
+              </div>
+
+              {/* Institutional Proof Points */}
+              <div className="hero-proof-bar" role="list" aria-label="Institutional highlights">
+                <div className="proof-item" role="listitem">
+                  <Award size={18} className="proof-icon" aria-hidden="true" />
+                  <span>{copy.heroBadge1}</span>
                 </div>
-                <div className="partner-meta">
-                  <strong>{copy.partners.church}</strong>
-                  <span>{copy.partners.college}</span>
+                <div className="proof-divider" aria-hidden="true">|</div>
+                <div className="proof-item" role="listitem">
+                  <Wrench size={18} className="proof-icon" aria-hidden="true" />
+                  <span>{copy.heroBadge2}</span>
+                </div>
+                <div className="proof-divider" aria-hidden="true">|</div>
+                <div className="proof-item" role="listitem">
+                  <ShieldCheck size={18} className="proof-icon" aria-hidden="true" />
+                  <span>{copy.heroBadge3}</span>
                 </div>
               </div>
-              <div className="partner-item">
-                <div className="partner-logo blue">
-                  <img src={crsLogo} alt={copy.partners.crs + " Logo"} />
-                </div>
-                <div className="partner-meta">
-                  <strong>{copy.partners.crs}</strong>
-                  <span>{copy.partners.ngo}</span>
+            </div>
+
+            <div className="hero-image-column">
+              <div className="hero-image-frame">
+                <img
+                  src={photos.hero}
+                  alt="Student engaged in hands-on automotive repair training in the college workshop"
+                  className="hero-primary-photo"
+                />
+                <div className="hero-photo-caption">
+                  <span className="caption-tag">Main Campus</span>
+                  <p className="caption-text">Emdibir, Gurage Zone.</p>
                 </div>
               </div>
             </div>
-            <small className="disclaimer">{copy.partners.note}</small>
-          </div>
-          <div className="hero-visual">
-            <img
-              src={hero}
-              alt="Students learning practical technical skills in a workshop"
-            />
           </div>
         </section>
 
-        <section className="intro-section">
-          <div className="wrap intro-grid">
-            <div className="intro-title">
+        {/* =========================================================
+            5.2 Who We Are Section
+            Balanced editorial image-and-text composition
+            ========================================================= */}
+        <section className="section who-we-are-section">
+          <div className="wrap who-we-are-grid">
+            <div className="who-image-wrap">
+              <img
+                src={photos.students}
+                alt="Students collaborating during practical technical instruction"
+                className="who-image"
+                loading="lazy"
+              />
+              <div className="who-image-overlay-card">
+                <span className="overlay-eyebrow">Institutional Purpose</span>
+                <strong>Forming Competent Technicians. Cultivating Responsible Citizens.</strong>
+              </div>
+            </div>
+
+            <div className="who-content-wrap">
               <Eyebrow>{copy.about.eyebrow}</Eyebrow>
-              <h2>
-                {copy.about.titleLine1}
-                <br />
-                {copy.about.titleLine2}
-              </h2>
-              <div className="small-note">
-                {copy.about.smallNote}
-                <br />
-                <span>{copy.about.smallNoteExtra}</span>
+              <h2 className="section-title">{copy.about.title}</h2>
+              <div className="editorial-prose">
+                <p>{copy.about.paragraph1}</p>
+                <p>{copy.about.paragraph2}</p>
               </div>
-            </div>
-            <div className="intro-text">
-              <p>{copy.about.paragraph1}</p>
-              <p>{copy.about.paragraph2}</p>
-              <a className="button button-light" href={getLocaleAwarePath('/about', locale)}>
-                {copy.about.learnMore} <ArrowRight size={15} />
-              </a>
+              <div className="who-actions">
+                <a
+                  className="inline-editorial-link"
+                  href={getLocaleAwarePath('/about', locale)}
+                >
+                  <span>{copy.about.learnMore}</span>
+                  <ArrowRight size={16} aria-hidden="true" />
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="section wrap">
-          <div className="section-header-row">
+        {/* =========================================================
+            5.3 Our Impact and Work Section
+            Verified metrics + qualitative impact + documentary photo
+            ========================================================= */}
+        <section className="section impact-section">
+          <div className="wrap">
+            <div className="impact-intro-header">
+              <Eyebrow>{copy.impact.eyebrow}</Eyebrow>
+              <h2 className="section-title">{copy.impact.title}</h2>
+              <p className="section-lead">{copy.impact.lead}</p>
+            </div>
+
+            <div className="impact-grid">
+              <div className="impact-stats-cluster">
+                {impactMetrics.map((m, idx) => (
+                  <div key={idx} className="impact-stat-card">
+                    <span className="impact-stat-number">{m.value}</span>
+                    <strong className="impact-stat-label">{m.label}</strong>
+                    <p className="impact-stat-detail">{m.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="impact-quote-card">
+                <div className="quote-mark" aria-hidden="true">“</div>
+                <blockquote className="impact-quote-text">{copy.impact.quote}</blockquote>
+                <cite className="impact-quote-author">{copy.impact.quoteAuthor}</cite>
+                <div className="impact-caption-note">
+                  <MapPin size={14} aria-hidden="true" />
+                  <span>Serving youth across the Gurage Zone and Central Ethiopia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            5.4 Educational Programs Section
+            Editorial grid of certified TVET programs
+            ========================================================= */}
+        <section className="section programs-section">
+          <div className="wrap">
             <SectionHeading
               eyebrow={copy.programs.eyebrow}
               title={copy.programs.title}
+              lead={copy.programs.lead}
+              link={copy.programs.viewAll}
+              href={getLocaleAwarePath('/programs', locale)}
             />
-            <p className="section-lead">{copy.programs.lead}</p>
-          </div>
-          {showProgramDelayNotice ? (
-            <p className="data-fallback-note">{dataFetchNotice}</p>
-          ) : null}
-          <div className="program-grid">
-            {previewPrograms.length > 0
-              ? previewPrograms.map((p, i) => (
-                  <ProgramCard key={p.title} p={p} index={i} />
-                ))
-              : Array.from({ length: 3 }, (_, index) => (
-                  <article
-                    key={`program-placeholder-${index}`}
-                    className="program-card placeholder-card"
-                    aria-hidden="true"
-                  >
-                    <div className="program-image placeholder-block" />
-                    <div className="program-card-content">
-                      <div className="card-meta">
-                        <span className="placeholder-line placeholder-line-short" />
-                        <span className="placeholder-line placeholder-line-short" />
-                      </div>
-                      <div className="placeholder-line placeholder-line-title" />
-                      <div className="placeholder-line placeholder-line-medium" />
-                      <div className="placeholder-line placeholder-line-medium" />
-                      <div className="card-bottom">
-                        <span className="placeholder-line placeholder-line-small" />
-                        <span className="placeholder-line placeholder-line-small" />
-                      </div>
-                    </div>
-                  </article>
-                ))}
-          </div>
-          <div className="program-section-actions">
-            <a className="button button-light" href={getLocaleAwarePath('/programs', locale)}>
-              {copy.programs.viewAll} <ArrowRight size={15} />
-            </a>
-          </div>
-        </section>
 
-        <section className="values-section">
-          <div className="wrap values-layout">
-            <div className="values-intro">
-              <Eyebrow>{copy.difference.eyebrow}</Eyebrow>
-              <h2>{copy.difference.title}</h2>
-              <div className="highlight-stat">
-                <strong>{copy.difference.statValue}</strong>
-                <span>{copy.difference.statLabel}</span>
-                <p>{copy.difference.statDescription}</p>
-              </div>
-            </div>
-            <div className="values-grid">
-              <div className="value-item">
-                <Wrench />
-                <h3>{copy.difference.values.workshop.title}</h3>
-                <p>{copy.difference.values.workshop.description}</p>
-              </div>
-              <div className="value-item">
-                <GraduationCap />
-                <h3>{copy.difference.values.instruction.title}</h3>
-                <p>{copy.difference.values.instruction.description}</p>
-              </div>
-              <div className="value-item">
-                <Users />
-                <h3>{copy.difference.values.industry.title}</h3>
-                <p>{copy.difference.values.industry.description}</p>
-              </div>
-              <div className="value-item">
-                <BookOpen />
-                <h3>{copy.difference.values.ethics.title}</h3>
-                <p>{copy.difference.values.ethics.description}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section wrap">
-          <div className="section-header-row">
-            <SectionHeading
-              eyebrow={copy.campus.eyebrow}
-              title={copy.campus.title}
-            />
-            <p className="section-lead">{copy.campus.lead}</p>
-          </div>
-
-          <div className="life-gallery" aria-label="Student life gallery">
-            <div className="life-showcase" aria-live="polite">
-              <div className="life-showcase-media">
-                <img
-                  key={activeItem.id}
-                  src={activeItem.image}
-                  alt={activeItem.title}
-                  className="life-showcase-image"
-                />
-                <div className="life-showcase-overlay" aria-hidden="true" />
-                <span className="life-showcase-badge">{activeItem.tag}</span>
-                <div className="life-showcase-caption">
-                  <p className="life-showcase-kicker">{activeItem.highlight}</p>
-                  <h3>{activeItem.title}</h3>
-                </div>
-              </div>
-            </div>
-
-            <div
-              className="life-grid"
-              role="list"
-              aria-label="Student life highlights"
-            >
-              {lifeGalleryItems.map((item, index) => (
-                <button
-                  type="button"
-                  key={item.id}
-                  className={`life-card ${index === activeIndex ? "is-active" : ""}`}
-                  onClick={() => setActiveIndex(index)}
-                  aria-pressed={index === activeIndex}
-                  aria-label={`View ${item.title}`}
-                >
-                  <div className="life-card-image">
-                    <img src={item.image} alt={item.title} />
-                  </div>
-                  <div className="life-card-body">
-                    <span className="life-card-index">0{index + 1}</span>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                  </div>
-                </button>
+            <div className="programs-editorial-grid">
+              {previewPrograms.map((program, index) => (
+                <ProgramCard key={program.id || program.title} p={program} index={index} />
               ))}
             </div>
 
-            <div
-              className="life-gallery-controls"
-              aria-label="Gallery navigation"
-            >
-              <button
-                type="button"
-                className="life-gallery-nav"
-                onClick={goToPrevious}
-                aria-label="Previous gallery item"
+            <div className="programs-bottom-bar">
+              <p>Looking for a specific department or entry requirement?</p>
+              <a
+                className="button button-outline"
+                href={getLocaleAwarePath('/programs', locale)}
               >
-                ←
-              </button>
-
-              <div
-                className="life-pagination"
-                role="tablist"
-                aria-label="Gallery item selector"
-              >
-                {lifeGalleryItems.map((item, index) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={`life-dot ${index === activeIndex ? "is-active" : ""}`}
-                    onClick={() => setActiveIndex(index)}
-                    aria-label={`Show ${item.title}`}
-                    aria-current={index === activeIndex ? "true" : undefined}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                className="life-gallery-nav"
-                onClick={goToNext}
-                aria-label="Next gallery item"
-              >
-                →
-              </button>
+                <span>{copy.programs.viewAll}</span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </a>
             </div>
-          </div>
-
-          <div className="program-section-actions">
-            <a className="button button-light" href={getLocaleAwarePath('/student-life', locale)}>
-              {copy.campus.closerLook} <ArrowRight size={15} />
-            </a>
           </div>
         </section>
 
-        <section className="announcement-compact-section">
+        {/* =========================================================
+            5.5 Practical Learning ("Learning by Doing")
+            Image-rich workshop immersion
+            ========================================================= */}
+        <section className="section practical-learning-section">
           <div className="wrap">
-            <div className="section-header-row">
-              <SectionHeading
-                eyebrow={copy.updates.eyebrow}
-                title={copy.updates.title}
-              />
-              <p className="section-lead">{copy.updates.lead}</p>
-            </div>
-            {showNewsDelayNotice || showEventDelayNotice ? (
-              <p className="data-fallback-note">{dataFetchNotice}</p>
-            ) : null}   
-            {featuredAnnouncements.length > 0 ? (
-              <div className="announcement-compact-list">
-                {featuredAnnouncements.slice(0, 3).map((item) => (
-                  <article
-                    className="mini-update"
-                    key={item.slug ?? item.title}
-                  >
-                    <div className="mini-update-pill">{copy.updates.notice}</div>
-                    <h3>{item.title}</h3>
-                    <p>
-                      {item.summary ??
-                        item.body ??
-                        "No announcement summary available yet."}
-                    </p>
-                    <span>{item.date ?? copy.updates.recently}</span>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="announcement-compact-list">
-                {Array.from({ length: 3 }, (_, index) => (
-                  <article
-                    key={`announcement-placeholder-${index}`}
-                    className="mini-update placeholder-card placeholder-card-compact"
-                    aria-hidden="true"
-                  >
-                    <div className="mini-update-pill placeholder-line placeholder-line-pill" />
-                    <div className="placeholder-line placeholder-line-title placeholder-title-compact" />
-                    <div className="placeholder-line placeholder-line-body" />
-                    <div className="placeholder-line placeholder-line-small placeholder-date-line" />
-                  </article>
-                ))}
-              </div>
-            )}
+            <div className="practical-learning-grid">
+              <div className="practical-copy-block">
+                <Eyebrow>{copy.practical.eyebrow}</Eyebrow>
+                <h2 className="section-title">{copy.practical.title}</h2>
+                <p className="section-lead">{copy.practical.lead}</p>
 
-            
-            <div className="news-events-layout">
-              <div className="news-featured-grid">
-                {featuredNews.length > 0
-                  ? featuredNews.slice(0, 3).map((item) => (
-                      <article
-                        className="news-featured-card"
-                        key={item.slug ?? item.title}
-                      >
-                        <div className="news-featured-media">
-                          {item.image_url ? (
-                            <img src={item.image_url} alt={item.title} />
-                          ) : null}
-                        </div>
-                        <div className="news-featured-body">
-                          <span>{item.category ?? copy.updates.news}</span>
-                          <h3>{item.title}</h3>
-                          <p>
-                            {item.summary ??
-                              item.body ??
-                              "No summary available yet."}
-                          </p>
-                          <a
-                            href={
-                              item.slug
-                                ? getLocaleAwarePath(`/news-events/${item.slug}`, locale)
-                                : getLocaleAwarePath('/news-events', locale)
-                            }
-                            className="news-read-more"
-                          >
-                            {copy.updates.readMore} <ArrowRight size={14} />
-                          </a>
-                        </div>
-                      </article>
-                    ))
-                  : Array.from({ length: 3 }, (_, index) => (
-                      <article
-                        key={`news-placeholder-${index}`}
-                        className="news-featured-card placeholder-card placeholder-news-card"
-                        aria-hidden="true"
-                      >
-                        <div className="news-featured-media placeholder-block" />
-                        <div className="news-featured-body">
-                          <div className="placeholder-line placeholder-line-pill" />
-                          <div className="placeholder-line placeholder-line-title placeholder-title-news" />
-                          <div className="placeholder-line placeholder-line-medium" />
-                          <div className="placeholder-line placeholder-line-medium" />
-                        </div>
-                      </article>
-                    ))}
-              </div>
-
-              <aside className="news-events-side">
-                <div className="updates-side-header">
-                  <Eyebrow>{copy.updates.upcoming}</Eyebrow>
+                <div className="practical-points-stack">
+                  <div className="practical-point-item">
+                    <div className="point-icon-box"><Wrench size={18} /></div>
+                    <div>
+                      <h3>{copy.practical.point1Title}</h3>
+                      <p>{copy.practical.point1Text}</p>
+                    </div>
+                  </div>
+                  <div className="practical-point-item">
+                    <div className="point-icon-box"><ShieldCheck size={18} /></div>
+                    <div>
+                      <h3>{copy.practical.point2Title}</h3>
+                      <p>{copy.practical.point2Text}</p>
+                    </div>
+                  </div>
+                  <div className="practical-point-item">
+                    <div className="point-icon-box"><Zap size={18} /></div>
+                    <div>
+                      <h3>{copy.practical.point3Title}</h3>
+                      <p>{copy.practical.point3Text}</p>
+                    </div>
+                  </div>
                 </div>
 
-                {eventItems.length > 0
-                  ? eventItems.map((event) => (
+                <a
+                  className="inline-editorial-link practical-link"
+                  href={getLocaleAwarePath('/student-life', locale)}
+                >
+                  <span>{copy.practical.cta}</span>
+                  <ArrowRight size={16} aria-hidden="true" />
+                </a>
+              </div>
+
+              <div className="practical-visual-collage">
+                <div className="collage-main-frame">
+                  <img
+                    src={photos.workshop}
+                    alt="Welding and metal fabrication student practicing in the booth"
+                    loading="lazy"
+                  />
+                  <div className="collage-badge">
+                    <span>Manufacturing &amp; Fabrication Bay</span>
+                  </div>
+                </div>
+                <div className="collage-secondary-row">
+                  <div className="collage-thumb">
+                    <img
+                      src={photos.electrical}
+                      alt="Electrical installation wiring boards"
+                      loading="lazy"
+                    />
+                    <span>Electrical Lab</span>
+                  </div>
+                  <div className="collage-thumb">
+                    <img
+                      src={photos.computer}
+                      alt="Computer networking and hardware station"
+                      loading="lazy"
+                    />
+                    <span>ICT Systems Lab</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            5.6 Community and Student Life
+            Human-centered presentation of college environment
+            ========================================================= */}
+        <section className="section community-life-section">
+          <div className="wrap">
+            <div className="community-life-header">
+              <Eyebrow>{copy.community.eyebrow}</Eyebrow>
+              <h2 className="section-title">{copy.community.title}</h2>
+              <p className="section-lead">{copy.community.lead}</p>
+            </div>
+
+            <div className="community-cards-grid">
+              <div className="community-card">
+                <div className="community-card-icon"><GraduationCap size={22} /></div>
+                <h3>{copy.community.item1Title}</h3>
+                <p>{copy.community.item1Desc}</p>
+              </div>
+
+              <div className="community-card">
+                <div className="community-card-icon"><Users size={22} /></div>
+                <h3>{copy.community.item2Title}</h3>
+                <p>{copy.community.item2Desc}</p>
+              </div>
+
+              <div className="community-card">
+                <div className="community-card-icon"><Hammer size={22} /></div>
+                <h3>{copy.community.item3Title}</h3>
+                <p>{copy.community.item3Desc}</p>
+              </div>
+            </div>
+
+            <div className="community-gallery-strip">
+              <div className="community-photo-item">
+                <img src={photos.library} alt="Campus library study room" loading="lazy" />
+                <span className="community-photo-label">Technical Library &amp; Study Room</span>
+              </div>
+              <div className="community-photo-item">
+                <img src={photos.classroom} alt="Interactive classroom discussion" loading="lazy" />
+                <span className="community-photo-label">Classroom Technical Instruction</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            5.7 Stories from Our Students
+            Featured testimonial + supporting quotes
+            ========================================================= */}
+        <section className="section student-stories-section">
+          <div className="wrap">
+            <div className="stories-header">
+              <Eyebrow>{copy.stories.eyebrow}</Eyebrow>
+              <h2 className="section-title">{copy.stories.title}</h2>
+              <p className="section-lead">{copy.stories.lead}</p>
+            </div>
+
+            <div className="stories-editorial-layout">
+              {featuredTestimonial && (
+                <div className="story-featured-card">
+                  <div className="story-featured-quote-mark" aria-hidden="true">“</div>
+                  <p className="story-featured-quote">{featuredTestimonial.quote}</p>
+                  <div className="story-featured-author">
+                    <img
+                      src={featuredTestimonial.avatar}
+                      alt={featuredTestimonial.name}
+                      loading="lazy"
+                    />
+                    <div>
+                      <strong className="author-name">{featuredTestimonial.name}</strong>
+                      <span className="author-program">{featuredTestimonial.program}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="supporting-stories-column">
+                {supportingTestimonials.map((t) => (
+                  <div key={t.name} className="supporting-story-card">
+                    <p className="supporting-quote">“{t.quote}”</p>
+                    <div className="supporting-author">
+                      <img src={t.avatar} alt={t.name} loading="lazy" />
+                      <div>
+                        <strong>{t.name}</strong>
+                        <span>{t.program}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            5.8 Our Partners Section
+            Institutional presentation: Catholic Church and CRS
+            ========================================================= */}
+        <section className="section partners-showcase-section">
+          <div className="wrap">
+            <div className="partners-showcase-header">
+              <Eyebrow>{copy.partners.eyebrow}</Eyebrow>
+              <h2 className="section-title">{copy.partners.title}</h2>
+              <p className="section-lead">{copy.partners.lead}</p>
+            </div>
+
+            <div className="partners-dual-grid">
+              <div className="partner-profile-card">
+                <div className="partner-profile-logo-wrap">
+                  <img src={churchLogo} alt="Ethiopian Catholic Church" className="partner-logo-img" />
+                </div>
+                <div className="partner-profile-body">
+                  <span className="partner-profile-badge">Founding &amp; Pastoral Partner</span>
+                  <h3>{copy.partners.church}</h3>
+                  <p>{copy.partners.churchDesc}</p>
+                </div>
+              </div>
+
+              <div className="partner-profile-card">
+                <div className="partner-profile-logo-wrap">
+                  <img src={crsLogo} alt="Catholic Relief Services (CRS)" className="partner-logo-img" />
+                </div>
+                <div className="partner-profile-body">
+                  <span className="partner-profile-badge">Development &amp; Capacity Partner</span>
+                  <h3>{copy.partners.crs}</h3>
+                  <p>{copy.partners.crsDesc}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="partners-statement-box">
+              <p>{copy.partners.note}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            5.9 News, Activities, and Events Section
+            1 featured story + supporting news + upcoming calendar
+            ========================================================= */}
+        <section className="section news-events-editorial-section">
+          <div className="wrap">
+            <SectionHeading
+              eyebrow={copy.news.eyebrow}
+              title={copy.news.title}
+              lead={copy.news.lead}
+              link={copy.news.viewAll}
+              href={getLocaleAwarePath('/news-events', locale)}
+            />
+
+            <div className="news-events-split-grid">
+              {/* Left Column: Featured News + Secondary News */}
+              <div className="news-column-main">
+                {leadArticle && (
+                  <article className="featured-news-card">
+                    <a
+                      href={getLocaleAwarePath(`/news-events/${leadArticle.slug || leadArticle.id}`, locale)}
+                      className="featured-news-image-wrap"
+                    >
+                      <img
+                        src={leadArticle.image_url || photos.automotive}
+                        alt={leadArticle.title}
+                        loading="lazy"
+                      />
+                      <span className="featured-badge">{copy.news.featuredTag}</span>
+                    </a>
+                    <div className="featured-news-body">
+                      <div className="news-meta-strip">
+                        <span className="news-cat">{leadArticle.category || 'Academic Life'}</span>
+                        <span className="news-date"><Calendar size={13} aria-hidden="true" /> {leadArticle.date || 'Sep 15, 2026'}</span>
+                      </div>
+                      <h3>
+                        <a href={getLocaleAwarePath(`/news-events/${leadArticle.slug || leadArticle.id}`, locale)}>
+                          {leadArticle.title}
+                        </a>
+                      </h3>
+                      <p>{leadArticle.summary}</p>
                       <a
-                        href="/news-events"
-                        key={event.slug ?? event.title}
-                        className="event-update-card"
+                        href={getLocaleAwarePath(`/news-events/${leadArticle.slug || leadArticle.id}`, locale)}
+                        className="read-story-link"
                       >
-                        <div className="event-update-date">
-                          <strong>{event.day ?? "—"}</strong>
-                          <span>{event.month ?? "TBD"}</span>
-                        </div>
-                        <div className="event-update-copy">
-                          <h4>{event.title}</h4>
-                          <p>
-                            {event.summary ?? event.location ?? "College event"}
-                          </p>
-                          {event.location ? (
-                            <small>{event.location}</small>
-                          ) : null}
-                        </div>
+                        <span>{copy.news.viewAll}</span>
+                        <ArrowRight size={14} aria-hidden="true" />
                       </a>
-                    ))
-                  : Array.from({ length: 3 }, (_, index) => (
-                      <div
-                        key={`event-placeholder-${index}`}
-                        className="event-update-card placeholder-event-card"
-                        aria-hidden="true"
-                      >
-                        <div className="event-update-date placeholder-block placeholder-date-block" />
-                        <div className="event-update-copy">
-                          <div className="placeholder-line placeholder-line-title placeholder-title-event" />
-                          <div className="placeholder-line placeholder-line-medium" />
+                    </div>
+                  </article>
+                )}
+
+                <div className="secondary-news-row">
+                  {secondaryNews.map((article) => (
+                    <NewsCard key={article.id || article.title} item={article} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Upcoming Events & Announcements */}
+              <aside className="events-announcements-sidebar">
+                <div className="sidebar-card events-sidebar-card">
+                  <div className="sidebar-header">
+                    <Calendar size={18} className="sidebar-icon" aria-hidden="true" />
+                    <h3>{copy.news.upcomingEvents}</h3>
+                  </div>
+                  <div className="events-mini-list">
+                    {eventItems.map((event) => (
+                      <div key={event.id || event.title} className="event-mini-item">
+                        <div className="event-mini-date">
+                          <span className="event-mini-day">
+                            {event.starts_at ? new Date(event.starts_at).getDate() : '10'}
+                          </span>
+                          <span className="event-mini-month">
+                            {event.starts_at ? new Date(event.starts_at).toLocaleString('en-US', { month: 'short' }) : 'Nov'}
+                          </span>
+                        </div>
+                        <div className="event-mini-content">
+                          <h4>{event.title}</h4>
+                          <span className="event-mini-loc"><MapPin size={12} aria-hidden="true" /> {event.location || 'College Campus'}</span>
                         </div>
                       </div>
                     ))}
+                  </div>
+                  <a
+                    href={getLocaleAwarePath('/news-events', locale)}
+                    className="sidebar-bottom-link"
+                  >
+                    <span>View Academic Calendar</span>
+                    <ArrowUpRight size={13} aria-hidden="true" />
+                  </a>
+                </div>
+
+                <div className="sidebar-card announcements-sidebar-card">
+                  <div className="sidebar-header">
+                    <BookOpen size={18} className="sidebar-icon" aria-hidden="true" />
+                    <h3>{copy.news.announcementsTag}</h3>
+                  </div>
+                  <div className="announcements-mini-list">
+                    {featuredAnnouncements.map((item) => (
+                      <a
+                        key={item.id || item.title}
+                        href={getLocaleAwarePath('/announcements', locale)}
+                        className="announcement-mini-item"
+                      >
+                        <span className="announcement-mini-audience">{item.audience || 'All Students'}</span>
+                        <h4>{item.title}</h4>
+                        <span className="announcement-mini-date">{item.date || 'Recently'}</span>
+                      </a>
+                    ))}
+                  </div>
+                  <a
+                    href={getLocaleAwarePath('/announcements', locale)}
+                    className="sidebar-bottom-link"
+                  >
+                    <span>Visit Noticeboard</span>
+                    <ArrowUpRight size={13} aria-hidden="true" />
+                  </a>
+                </div>
               </aside>
             </div>
-            <div className="program-section-actions">
-              <a className="button button-light" href={getLocaleAwarePath('/news-events', locale)}>
-                {copy.updates.explore} <ArrowRight size={15} />
-              </a>
-            </div>
           </div>
         </section>
 
-        <section className="admissions-band">
-          <div className="wrap admissions-panel">
-            <Eyebrow>{copy.admissions.eyebrow}</Eyebrow>
-            <h2>{copy.admissions.title}</h2>
-            <p>{copy.admissions.body}</p>
-            <div className="admission-contact">
-              <span>
-                <strong>{copy.admissions.admissionsLabel}</strong>
-                <br />
-                {copy.admissions.requirements}
-              </span>
-              <span>
-                <strong>{copy.admissions.officeHours}</strong>
-                <br />
-                {copy.admissions.officeHoursValue}
-              </span>
-              <span>
-                <strong>{copy.admissions.location}</strong>
-                <br />
-                {copy.admissions.locationValue}
-              </span>
-            </div>
-            <div className="hero-actions">
-              <a className="button button-gold" href={getLocaleAwarePath('/admissions', locale)}>
-                {copy.admissions.viewRequirements} <ArrowRight size={15} />
-              </a>
-              <a className="button button-outline-light" href={getLocaleAwarePath('/contact', locale)}>
-                {copy.admissions.contactAdmissions}
-              </a>
-            </div>
-          </div>
-        </section>
+        {/* =========================================================
+            5.10 Admissions Section
+            Compact, informative guidance without aggressive funneling
+            ========================================================= */}
+        <section className="section admissions-teaser-section">
+          <div className="wrap admissions-teaser-card">
+            <div className="admissions-teaser-content">
+              <Eyebrow>{copy.admissions.eyebrow}</Eyebrow>
+              <h2>{copy.admissions.title}</h2>
+              <p className="admissions-teaser-lead">{copy.admissions.lead}</p>
 
-        <section className="home-contact-strip">
-          <div className="wrap home-contact-panel">
-            <div className="home-contact-visual">
-              <div className="home-contact-copy">
-                <Eyebrow>{copy.contact.eyebrow}</Eyebrow>
-                <h2>{copy.contact.title}</h2>
-                <p>{copy.contact.body}</p>
-              </div>
-              <div className="home-contact-map">
-                <iframe
-                  title="Saint Anthony's College map"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1103.185325850251!2d37.935426474146624!3d8.121811753418188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x17b2e10da7ac2987%3A0xe0d8d3b1c9d93124!2sSt.%20Anthony%20TVTE%20College!5e1!3m2!1sen!2sus!4v1791559060012!5m2!1sen!2sus"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  allowFullScreen
-                />
-              </div>
-            </div>
-
-            <div className="home-contact-details">
-              <div className="contact-detail-block">
-                <div className="contact-detail-icon">
-                  <MapPin size={18} />
+              <div className="admissions-points-row">
+                <div className="admissions-point">
+                  <CheckCircle2 size={18} className="point-check" aria-hidden="true" />
+                  <div>
+                    <strong>{copy.admissions.box1Title}</strong>
+                    <p>{copy.admissions.box1Desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <strong>{copy.contact.address}</strong>
-                  <span>
-                    Saint Anthony’s Technical and Vocational College
-                    <br />
-                    Ethiopia
-                  </span>
+                <div className="admissions-point">
+                  <CheckCircle2 size={18} className="point-check" aria-hidden="true" />
+                  <div>
+                    <strong>{copy.admissions.box2Title}</strong>
+                    <p>{copy.admissions.box2Desc}</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="contact-detail-block">
-                <div className="contact-detail-icon">
-                  <Phone size={18} />
-                </div>
-                <div>
-                  <strong>{copy.contact.phone}</strong>
-                  <a href="tel:+251000000000">+251 000 000 000</a>
-                  <a href="tel:+251000000001">+251 000 000 001</a>
-                </div>
-              </div>
-
-              <div className="contact-detail-block">
-                <div className="contact-detail-icon">
-                  <Mail size={18} />
-                </div>
-                <div>
-                  <strong>{copy.contact.email}</strong>
-                  <a href="mailto:info@saintanthonycollege.edu.et">
-                    info@saintanthonycollege.edu.et
-                  </a>
-                  <a href="mailto:admissions@saintanthonycollege.edu.et">
-                    admissions@saintanthonycollege.edu.et
-                  </a>
-                </div>
-              </div>
-
-              <div className="home-contact-actions">
-                <a className="button button-dark" href={getLocaleAwarePath('/contact', locale)}>
-                  {copy.contact.contactCollege} <ArrowRight size={15} />
+              <div className="admissions-cta-group">
+                <a
+                  className="button button-navy"
+                  href={getLocaleAwarePath('/how-to-apply', locale)}
+                >
+                  <span>{copy.admissions.cta}</span>
+                  <ArrowRight size={15} aria-hidden="true" />
+                </a>
+                <a
+                  className="button button-outline"
+                  href={getLocaleAwarePath('/admissions', locale)}
+                >
+                  <span>{copy.admissions.secondary}</span>
                 </a>
               </div>
+            </div>
+
+            <div className="admissions-aside-schedule">
+              <h3>Admissions Office Emdibir</h3>
+              <p className="aside-sub">Main Administration Building, Ground Floor</p>
+              <div className="aside-schedule-row">
+                <span>Working Days:</span>
+                <strong>Monday – Friday</strong>
+              </div>
+              <div className="aside-schedule-row">
+                <span>Office Hours:</span>
+                <strong>8:00 AM – 5:00 PM</strong>
+              </div>
+              <div className="aside-schedule-row">
+                <span>Direct Inquiries:</span>
+                <strong>+251 911 000 000</strong>
+              </div>
+              <div className="aside-desk-note">
+                <span>Walk-in consultations welcome for applicants &amp; parents.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            5.11 Final Institutional Message
+            Meaningful closing message & direct navigation
+            ========================================================= */}
+        <section className="section final-institutional-section">
+          <div className="wrap final-institutional-panel">
+            <div className="final-message-copy">
+              <Eyebrow>{copy.closing.eyebrow}</Eyebrow>
+              <h2>{copy.closing.title}</h2>
+              <p>{copy.closing.lead}</p>
+            </div>
+            <div className="final-message-actions">
+              <a
+                className="button button-navy"
+                href={getLocaleAwarePath('/programs', locale)}
+              >
+                <span>{copy.closing.ctaPrograms}</span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </a>
+              <a
+                className="button button-outline"
+                href={getLocaleAwarePath('/contact', locale)}
+              >
+                <span>{copy.closing.ctaContact}</span>
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </a>
             </div>
           </div>
         </section>

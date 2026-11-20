@@ -19,7 +19,7 @@
   margin-bottom: var(--sp-4);
   padding: var(--sp-6);
   border-radius: var(--ds-r-xl);
-  background: var(--ds-inverse);
+  background: linear-gradient(135deg, #3E2723 0%, #5d3b34 60%, #7a4a3a 100%);
   color: var(--ds-inverse-ink);
 }
 .sa-student-photo {
@@ -51,7 +51,7 @@
 }
 .sa-gpa small { display: block; margin-top: var(--sp-1); font-size: var(--fs-caption); color: var(--ds-inverse-muted); }
 .sa-gpa-line { height: 4px; margin-top: var(--sp-3); overflow: hidden; border-radius: var(--ds-r-pill); background: rgba(255, 255, 255, 0.2); }
-.sa-gpa-line i { display: block; height: 100%; border-radius: inherit; background: var(--ds-inverse-ink); transition: width 600ms var(--ds-ease); }
+.sa-gpa-line i { display: block; height: 100%; border-radius: inherit; background: #E09F3E; transition: width 600ms var(--ds-ease); }
 
 /* ---------------------------------------------------------------------------
    Segmented control (DESIGN.md pricing tabs: selected = lift onto white)

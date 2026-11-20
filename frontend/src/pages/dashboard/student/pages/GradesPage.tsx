@@ -5,9 +5,7 @@ import { apiRequest } from "../../../../services/api";
 import SkeletonLoader from "../../../../components/SkeletonLoader";
 import {
   StudentGradesResponse,
-  StudentAssessment,
   assessmentTypeLabel,
-  formatDate,
   formatPercent,
   formatShortDate,
   gradeTone,
@@ -19,16 +17,18 @@ type Props = {
   studentName: string;
 };
 
-/** Collapse a table into labelled rows on small screens (reuses .sa-st-restable). */
+/** Course grade card with progress bar and assessment list. */
 function GradesCard({ course }: { course: NonNullable<StudentGradesResponse["courses"]>[number] }) {
   const pass = course.percent != null ? course.percent >= 60 : null;
+  const pct = course.percent ?? 0;
+
   return (
-    <section className="sa-panel sa-st-flush" aria-labelledby={`grades-${course.offering_id}`}>
-      <div className="sa-panel-heading sa-st-padded">
+    <section className="sa-card sa-card-hover" aria-labelledby={`grades-${course.offering_id}`}>
+      <div className="sa-card-heading">
         <div>
           <h3 id={`grades-${course.offering_id}`}>{course.course_code}</h3>
           <p>{course.course_title}</p>
-          <div className="sa-st-meta-wrap">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-1) var(--sp-3)", fontSize: "var(--fs-xs)", color: "var(--ds-muted)", marginTop: "var(--sp-2)" }}>
             <span>Section {course.section}</span>
             <span>·</span>
             <span>{course.teacher || "Instructor TBA"}</span>
@@ -36,26 +36,26 @@ function GradesCard({ course }: { course: NonNullable<StudentGradesResponse["cou
             <span>{course.semester_name} · {course.academic_year}</span>
           </div>
         </div>
-        <div className="sa-st-kpi-wrap">
+        <div className="sa-stat-wrap">
           {course.percent != null ? (
             <>
-              <div className="sa-stat-card">
-                <span className="sa-st-cap">Course percent</span>
-                <strong>{formatPercent(course.percent)}</strong>
+              <div className="sa-stat-item">
+                <span className="sa-stat-label">Course percent</span>
+                <strong className="sa-stat-value">{formatPercent(course.percent)}</strong>
               </div>
-              <div className="sa-stat-card">
-                <span className="sa-st-cap">Grade</span>
-                <strong className={letterGradeClass(course.letter_grade)}>
+              <div className="sa-stat-item">
+                <span className="sa-stat-label">Grade</span>
+                <strong className="sa-stat-value" style={{ color: "var(--ds-terracotta-dark)" }}>
                   {course.letter_grade || "—"}
                 </strong>
               </div>
-              <div className="sa-stat-card">
-                <span className="sa-st-cap">Grade point</span>
-                <strong>{course.grade_point != null ? course.grade_point.toFixed(2) : "—"}</strong>
+              <div className="sa-stat-item">
+                <span className="sa-stat-label">Grade point</span>
+                <strong className="sa-stat-value">{course.grade_point != null ? course.grade_point.toFixed(2) : "—"}</strong>
               </div>
-              <div className="sa-stat-card">
-                <span className="sa-st-cap">Credit hours</span>
-                <strong>{course.credit_hours}</strong>
+              <div className="sa-stat-item">
+                <span className="sa-stat-label">Credit hours</span>
+                <strong className="sa-stat-value">{course.credit_hours}</strong>
               </div>
             </>
           ) : (
@@ -64,10 +64,34 @@ function GradesCard({ course }: { course: NonNullable<StudentGradesResponse["cou
         </div>
       </div>
 
+      {course.percent != null && (
+        <div style={{ marginTop: "var(--sp-4)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--sp-2)", marginBottom: "var(--sp-2)" }}>
+            <span style={{ fontSize: "var(--fs-xs)", fontWeight: 600, color: "var(--ds-muted)" }}>Progress</span>
+            <div style={{ flex: 1, height: 8, background: "var(--ds-cream-2)", borderRadius: "var(--r-pill)", overflow: "hidden" }}>
+              <div
+                style={{
+                  height: "100%",
+                  width: Math.min(100, Math.max(0, pct)) + "%",
+                  background: pass ? "var(--ds-good)" : "var(--ds-warn)",
+                  borderRadius: "var(--r-pill)",
+                  transition: "width 600ms var(--ds-ease)",
+                }}
+              />
+            </div>
+            <span style={{ fontSize: "var(--fs-xs)", fontWeight: 700, color: "var(--ds-ink)", minWidth: "40px", textAlign: "right" }}>{formatPercent(course.percent)}</span>
+          </div>
+          <p style={{ fontSize: "var(--fs-xs)", color: "var(--ds-muted)", margin: 0 }}>
+            Course percent uses assessment weights where defined; otherwise raw marks. Pass mark 60%.
+            {pass ? "" : " Below pass mark."}
+          </p>
+        </div>
+      )}
+
       {course.assessments.length === 0 ? (
-        <p className="sa-st-empty">No published assessments for this course.</p>
+        <p className="sa-st-empty" style={{ marginTop: "var(--sp-4)" }}>No published assessments for this course.</p>
       ) : (
-        <table className="sa-table sa-st-restable" role="region" aria-label={`Grades for ${course.course_code}`}>
+        <table className="sa-table sa-st-restable" role="region" aria-label={`Grades for ${course.course_code}`} style={{ marginTop: "var(--sp-4)" }}>
           <thead>
             <tr>
               <th scope="col">Assessment</th>
@@ -102,13 +126,6 @@ function GradesCard({ course }: { course: NonNullable<StudentGradesResponse["cou
             ))}
           </tbody>
         </table>
-      )}
-
-      {course.percent != null && (
-        <p className="sa-st-footnote sa-st-padded">
-          Course percent uses assessment weights where defined; otherwise raw marks. Pass mark 60%.
-          {pass ? "" : " Below pass mark."}
-        </p>
       )}
     </section>
   );
@@ -147,8 +164,8 @@ export default function GradesPage({ studentId, studentName }: Props) {
 
   return (
     <>
-      <section className="sa-panel sa-st-flush" aria-labelledby="overview-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="overview-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="overview-h">Grades overview</h3>
             <p>Only results submitted by your instructor and published by the college.</p>
@@ -156,13 +173,13 @@ export default function GradesPage({ studentId, studentName }: Props) {
         </div>
         <div className="sa-stat-grid">
           <div className="sa-stat-card">
-            <span className="sa-st-cap">Courses with results</span>
+            <div className="sa-stat-top"><span>Courses with results</span></div>
             <strong>{courses.filter((c) => c.percent != null).length}</strong>
             <p>of {courses.length} enrolled</p>
           </div>
           {cumulativeGpa ? (
             <div className="sa-stat-card">
-              <span className="sa-st-cap">Cumulative GPA</span>
+              <div className="sa-stat-top"><span>Cumulative GPA</span></div>
               <strong>{cumulativeGpa}</strong>
               <p>{gpaCount} course{gpaCount === 1 ? "" : "s"} counted</p>
             </div>
@@ -170,8 +187,8 @@ export default function GradesPage({ studentId, studentName }: Props) {
         </div>
       </section>
 
-      <section className="sa-panel sa-st-flush" aria-labelledby="courses-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="courses-h">
+        <div className="sa-card-heading">
           <div><h3 id="courses-h">Results by course</h3><p>Assessment marks, totals and letter grades.</p></div>
         </div>
         {courses.length === 0 ? (

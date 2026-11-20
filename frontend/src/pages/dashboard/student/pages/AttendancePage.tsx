@@ -48,48 +48,74 @@ export default function AttendancePage({ studentId, studentName }: Props) {
 
   return (
     <>
-      <section className="sa-panel sa-st-flush" aria-labelledby="overview-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="overview-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="overview-h">Attendance</h3>
             <p>
-              Excused sessions are shown separately and do not count against your rate. Minimum:{threshold}%
+              Excused sessions are shown separately and do not count against your rate. Minimum: {threshold}%
             </p>
           </div>
         </div>
 
-        <div className="sa-st-grid2">
-          <div className="sa-stat-card">
-            <div className="sa-stat-top"><span>Overall rate</span></div>
-            <strong>{formatPercent(pct)}</strong>
-            <p>
-              {overall.present + overall.late} of {overall.total_sessions} sessions attended
-            </p>
+        <div className="sa-stat-wrap">
+          <div className="sa-stat-item">
+            <span className="sa-stat-label">Overall rate</span>
+            <strong className="sa-stat-value">{formatPercent(pct)}</strong>
           </div>
-          <div className="sa-stat-card">
-            <div className="sa-stat-top"><span>Present</span></div>
-            <strong>{overall.present}</strong>
-            <p>{overall.late} late · {overall.absent} absent</p>
+          <div className="sa-stat-item">
+            <span className="sa-stat-label">Present</span>
+            <strong className="sa-stat-value">{overall.present}</strong>
+          </div>
+          <div className="sa-stat-item">
+            <span className="sa-stat-label">Late</span>
+            <strong className="sa-stat-value">{overall.late}</strong>
+          </div>
+          <div className="sa-stat-item">
+            <span className="sa-stat-label">Absent</span>
+            <strong className="sa-stat-value">{overall.absent}</strong>
           </div>
           {overall.excused > 0 && (
-            <div className="sa-stat-card">
-              <div className="sa-stat-top"><span>Excused</span></div>
-              <strong>{overall.excused}</strong>
-              <p>Not counted against you</p>
+            <div className="sa-stat-item">
+              <span className="sa-stat-label">Excused</span>
+              <strong className="sa-stat-value">{overall.excused}</strong>
             </div>
           )}
         </div>
 
         {pct != null && pct < threshold && (
-          <p className="sa-st-footnote sa-text-warning">
+          <p className="sa-st-note">
             <b>Attendance warning:</b> your rate is below the {threshold}% minimum. Contact your instructor or the
-            registrar’s office.
+            registrar's office.
           </p>
         )}
+
+        <div style={{ marginTop: "var(--sp-4)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--sp-2)", marginBottom: "var(--sp-2)" }}>
+            <span style={{ fontSize: "var(--fs-xs)", fontWeight: 600, color: "var(--ds-muted)" }}>Attendance progress</span>
+            <div style={{ flex: 1, height: 8, background: "var(--ds-cream-2)", borderRadius: "var(--r-pill)", overflow: "hidden" }}>
+              <div
+                style={{
+                  height: "100%",
+                  width: Math.min(100, Math.max(0, pct ?? 0)) + "%",
+                  background: pct != null && pct < threshold ? "var(--ds-warn)" : "var(--ds-good)",
+                  borderRadius: "var(--r-pill)",
+                  transition: "width 600ms var(--ds-ease)",
+                }}
+              />
+            </div>
+            <span style={{ fontSize: "var(--fs-xs)", fontWeight: 700, color: "var(--ds-ink)", minWidth: "40px", textAlign: "right" }}>
+              {formatPercent(pct)}
+            </span>
+          </div>
+          <p style={{ fontSize: "var(--fs-xs)", color: "var(--ds-muted)", margin: 0 }}>
+            {overall.present + overall.late} of {overall.total_sessions} sessions attended
+          </p>
+        </div>
       </section>
 
-      <section className="sa-panel sa-st-flush" aria-labelledby="byclass-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="byclass-h">
+        <div className="sa-card-heading">
           <div><h3 id="byclass-h">Attendance by course</h3><p>Sessions you missed, per enrolled class.</p></div>
         </div>
         {by_class.length === 0 ? (
@@ -135,8 +161,8 @@ export default function AttendancePage({ studentId, studentName }: Props) {
         )}
       </section>
 
-      <section className="sa-panel sa-st-flush" aria-labelledby="sessions-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="sessions-h">
+        <div className="sa-card-heading">
           <div><h3 id="sessions-h">Recent sessions</h3><p>Most recent first.</p></div>
         </div>
         {sessions.length === 0 ? (

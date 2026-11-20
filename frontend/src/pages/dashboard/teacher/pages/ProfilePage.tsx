@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { apiRequest } from "../../../../services/api";
 import { TeacherDashboardResponse } from "../TeacherDashboard";
 import LoadingState from "../../admin/components/LoadingState";
-import ErrorState from "../../admin/components/ErrorState";
 
 type Props = { data: TeacherDashboardResponse | null; loading: boolean };
 

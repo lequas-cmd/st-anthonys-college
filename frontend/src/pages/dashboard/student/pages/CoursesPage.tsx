@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
 import "../../../../styles/dashboard/shared.css";
 import "../../../../styles/dashboard/student.css";
 import { apiRequest } from "../../../../services/api";
@@ -20,43 +18,38 @@ import {
 
 /* ---------- course card (list view) ---------- */
 function CourseCard({ course, onOpen }: { course: StudentCourse; onOpen: (c: StudentCourse) => void }) {
-  const pass = course.percent != null ? course.percent >= 60 : null;
   return (
     <article
-      className="sa-panel sa-st-flush"
+      className="sa-course-card"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === "Enter") onOpen(course); }}
       onClick={() => onOpen(course)}
-      style={{ cursor: "pointer" }}
     >
-      <div className="sa-panel-heading sa-st-padded">
-        <div>
-          <h3>{course.course_code}</h3>
-          <p>{course.course_title}</p>
-          <div className="sa-st-meta-wrap">
-            <span>Section {course.section}</span>
-            <span>·</span>
-            <span>{course.teacher || "Instructor TBA"}</span>
-            <span>·</span>
-            <span>{course.room || "Room TBA"}</span>
-          </div>
-        </div>
-        <div className="sa-st-kpi-wrap">
-          <span className={`sa-badge ${statusTone(course.status)}`}>{course.status}</span>
-          {course.percent != null ? (
-            <div>
-              <strong>{formatPercent(course.percent)}</strong>
-              <span className={`sa-badge ${gradeTone(course.letter_grade ?? "")}`}>{course.letter_grade}</span>
-            </div>
-          ) : null}
-        </div>
+      <div className="course-head">
+        <div className="course-code">{course.course_code}</div>
+        <span className={`course-badge ${statusTone(course.status)}`}>{course.status}</span>
       </div>
-      <footer className="sa-st-card-footer">
-        <button type="button" className="sa-link-button" onClick={(e) => { e.stopPropagation(); onOpen(course); }}>
-          View course <ChevronRight size={14} />
-        </button>
-      </footer>
+      <div className="course-title">{course.course_title}</div>
+      <div className="course-meta">
+        <span>Section {course.section}</span>
+        <span>·</span>
+        <span>{course.teacher || "Instructor TBA"}</span>
+        <span>·</span>
+        <span>{course.room || "Room TBA"}</span>
+      </div>
+      <div className="course-footer">
+        {course.percent != null ? (
+          <>
+            <span className="course-percent">{formatPercent(course.percent)}</span>
+            <span className={`course-grade ${gradeTone(course.letter_grade ?? "")}`}>
+              {course.letter_grade}
+            </span>
+          </>
+        ) : (
+          <span className="course-percent">—</span>
+        )}
+      </div>
     </article>
   );
 }
@@ -65,8 +58,8 @@ function CourseCard({ course, onOpen }: { course: StudentCourse; onOpen: (c: Stu
 function CoursesList({ courses, onOpen }: { courses: StudentCourse[]; onOpen: (c: StudentCourse) => void }) {
   if (courses.length === 0) {
     return (
-      <section className="sa-panel sa-st-flush" aria-labelledby="courses-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="courses-h">
+        <div className="sa-card-heading">
           <div><h3 id="courses-h">My courses</h3><p>Registrar-enrolled classes this college year.</p></div>
         </div>
         <p className="sa-st-empty">You are not currently enrolled in any courses.</p>
@@ -74,11 +67,11 @@ function CoursesList({ courses, onOpen }: { courses: StudentCourse[]; onOpen: (c
     );
   }
   return (
-    <section className="sa-panel sa-st-flush" aria-labelledby="courses-h">
-      <div className="sa-panel-heading sa-st-padded">
+    <section className="sa-card" aria-labelledby="courses-h">
+      <div className="sa-card-heading">
         <div><h3 id="courses-h">My courses</h3><p>Registrar-enrolled classes this college year.</p></div>
       </div>
-      <div className="sa-st-grid2">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--sp-4)" }}>
         {courses.map((course) => (
           <CourseCard key={course.offering_id} course={course} onOpen={onOpen} />
         ))}
@@ -96,12 +89,12 @@ function CourseDetail({ course, onBack }: { course: StudentCourseDetail; onBack:
       <button type="button" className="sa-link-button" onClick={onBack}>
         ← Back to my courses
       </button>
-      <section className="sa-panel sa-st-flush" aria-labelledby="detail-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="detail-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="detail-h">{c.course_code}</h3>
             <p>{c.course_title}</p>
-            <div className="sa-st-meta-wrap">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-1) var(--sp-3)", fontSize: "var(--fs-xs)", color: "var(--ds-muted)", marginTop: "var(--sp-2)" }}>
               <span>Section {c.section}</span>
               <span>·</span>
               <span>{c.teacher || "Instructor not assigned"}</span>
@@ -111,28 +104,32 @@ function CourseDetail({ course, onBack }: { course: StudentCourseDetail; onBack:
               <span>{c.semester_name} · {c.academic_year}</span>
             </div>
             {c.credit_hours && (
-              <p className="sa-st-footnote">
+              <p className="sa-st-note" style={{ marginTop: "var(--sp-3)" }}>
                 {c.credit_hours} credit hour{c.credit_hours === 1 ? "" : "s"} · Status:{" "}
                 <span className={`sa-badge ${statusTone(c.status)}`}>{c.status}</span>
               </p>
             )}
           </div>
-          <div className="sa-st-kpi-wrap">
+          <div className="sa-stat-wrap">
             {summary ? (
               <>
-                <div className="sa-stat-card">
-                  <span className="sa-st-cap">Course percent</span>
-                  <strong>{formatPercent(summary.percent)}</strong>
+                <div className="sa-stat-item">
+                  <span className="sa-stat-label">Course percent</span>
+                  <strong className="sa-stat-value">{formatPercent(summary.percent)}</strong>
                 </div>
-                <div className="sa-stat-card">
-                  <span className="sa-st-cap">Grade</span>
-                  <strong className={letterGradeClass(summary.letter_grade)}>
+                <div className="sa-stat-item">
+                  <span className="sa-stat-label">Grade</span>
+                  <strong className="sa-stat-value" style={{ color: "var(--ds-terracotta-dark)" }}>
                     {summary.letter_grade || "—"}
                   </strong>
                 </div>
-                <div className="sa-stat-card">
-                  <span className="sa-st-cap">Grade point</span>
-                  <strong>{summary.grade_point != null ? summary.grade_point.toFixed(2) : "—"}</strong>
+                <div className="sa-stat-item">
+                  <span className="sa-stat-label">Grade point</span>
+                  <strong className="sa-stat-value">{summary.grade_point != null ? summary.grade_point.toFixed(2) : "—"}</strong>
+                </div>
+                <div className="sa-stat-item">
+                  <span className="sa-stat-label">Assessments</span>
+                  <strong className="sa-stat-value">{summary.assessments_count}</strong>
                 </div>
               </>
             ) : (
@@ -141,10 +138,10 @@ function CourseDetail({ course, onBack }: { course: StudentCourseDetail; onBack:
           </div>
         </div>
 
-        {/* timetable */}
-        <div className="sa-st-grid2">
-          <section className="sa-panel" aria-labelledby="tt-h">
-            <div className="sa-panel-heading sa-st-padded">
+        {/* timetable + grades side by side */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sp-4)", marginTop: "var(--sp-4)" }}>
+          <section className="sa-card" aria-labelledby="tt-h">
+            <div className="sa-card-heading">
               <div><h3 id="tt-h">Class schedule</h3><p>Weekly timetable for this course.</p></div>
             </div>
             {timetable.length === 0 ? (
@@ -175,8 +172,8 @@ function CourseDetail({ course, onBack }: { course: StudentCourseDetail; onBack:
             )}
           </section>
 
-          <section className="sa-panel sa-st-flush" aria-labelledby="grades-h">
-            <div className="sa-panel-heading sa-st-padded">
+          <section className="sa-card" aria-labelledby="grades-h">
+            <div className="sa-card-heading">
               <div><h3 id="grades-h">Grades</h3><p>Published results for this course.</p></div>
             </div>
             {grades.length === 0 ? (

@@ -48,8 +48,8 @@ export default function TimetablePage({ studentId, studentName }: Props) {
 
   return (
     <>
-      <section className="sa-panel sa-st-flush" aria-labelledby="tt-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="tt-h">
+        <div className="sa-card-heading">
           <div>
             <h3 id="tt-h">Timetable</h3>
             <p>Your weekly class schedule for the current term.</p>
@@ -59,46 +59,48 @@ export default function TimetablePage({ studentId, studentName }: Props) {
         {data.entries.length === 0 ? (
           <p className="sa-st-empty">No timetable entries have been scheduled for your courses yet.</p>
         ) : (
-          <div className="sa-st-week">
-            {DAYS.map((day, i) => {
-              const weekday = i + 1;
-              const dayEntries = entriesByDay[weekday] ?? [];
-              const isToday = weekday === new Date().getDay() || weekday === ((new Date().getDay() + 6) % 7) + 1;
-              return (
-                <section key={day} className={`sa-st-weekcol${isToday ? " is-today" : ""}`}>
-                  <header>
-                    <b>{day}</b>
-                    <span>{dayEntries.length} class{dayEntries.length === 1 ? "" : "es"}</span>
-                  </header>
-                  <div className="sa-st-weekitems">
-                    {dayEntries.length === 0 ? (
-                      <p className="sa-st-none">No classes</p>
-                    ) : (
-                      dayEntries.map((entry) => (
-                        <article
-                          key={entry.id}
-                          className={`sa-st-chip${isToday ? " is-selected" : ""}`}
-                        >
-                          <span className="sa-st-chip-time">{formatTimeRange(entry.starts_at, entry.ends_at)}</span>
-                          <span className="sa-st-chip-title">
-                            <strong>{entry.course_code}</strong>
-                            <span>{entry.course_title}</span>
-                          </span>
-                          <span className="sa-st-chip-room">{entry.room || "Room TBA"}</span>
-                          <span className={`sa-badge ${statusTone(entry.status)}`}>{entry.status}</span>
-                        </article>
-                      ))
-                    )}
-                  </div>
-                </section>
-              );
-            })}
+          <div className="sa-st-timetable-wrap">
+            <div className="sa-st-week">
+              {DAYS.map((day, i) => {
+                const weekday = i + 1;
+                const dayEntries = entriesByDay[weekday] ?? [];
+                const isToday = weekday === new Date().getDay() || weekday === ((new Date().getDay() + 6) % 7) + 1;
+                return (
+                  <section key={day} className={`sa-st-weekcol${isToday ? " is-today" : ""}`}>
+                    <header>
+                      <b>{day}</b>
+                      <span>{dayEntries.length} class{dayEntries.length === 1 ? "" : "es"}</span>
+                    </header>
+                    <div className="sa-st-weekitems">
+                      {dayEntries.length === 0 ? (
+                        <p className="sa-st-none">No classes</p>
+                      ) : (
+                        dayEntries.map((entry) => (
+                          <article
+                            key={entry.id}
+                            className={`sa-st-chip${isToday ? " is-selected" : ""}`}
+                          >
+                            <span className="sa-st-chip-time">{formatTimeRange(entry.starts_at, entry.ends_at)}</span>
+                            <span className="sa-st-chip-title">
+                              <strong>{entry.course_code}</strong>
+                              <span>{entry.course_title}</span>
+                            </span>
+                            <span className="sa-st-chip-room">{entry.room || "Room TBA"}</span>
+                            <span className={`sa-badge ${statusTone(entry.status)}`}>{entry.status}</span>
+                          </article>
+                        ))
+                      )}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
           </div>
         )}
       </section>
 
-      <section className="sa-panel sa-st-flush" aria-labelledby="list-h">
-        <div className="sa-panel-heading sa-st-padded">
+      <section className="sa-card" aria-labelledby="list-h">
+        <div className="sa-card-heading">
           <div><h3 id="list-h">All classes (chronological)</h3><p>Ordered by day and start time.</p></div>
         </div>
         {data.entries.length === 0 ? (

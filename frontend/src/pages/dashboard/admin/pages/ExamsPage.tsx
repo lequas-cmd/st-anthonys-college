@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../../services/api";
-import AdminDataTable, { Column } from "../components/AdminDataTable";
+import AdminDataTable from "../components/AdminDataTable";
 import AdminCrudModal, { CrudField } from "../components/AdminCrudModal";
-import ConfirmDialog from "../components/ConfirmDialog";
-import StatusBadge from "../components/StatusBadge";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
@@ -14,13 +12,13 @@ export default function ExamsPage({ data, loading: parentLoading }: { data: any;
   const [error, setError] = useState<string | null>(null);
 
   const [examSchedules, setExamSchedules] = useState<any[]>([]);
-  const [assessments, setAssessments] = useState<any[]>([]);
+  const [, setAssessments] = useState<any[]>([]);
   const [offerings, setOfferings] = useState<any[]>([]);
   const [grades, setGrades] = useState<any[]>([]);
   const [selectedOffering, setSelectedOffering] = useState<number | null>(null);
   const [gradingScales, setGradingScales] = useState<any[]>([]);
   const [batches, setBatches] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [, setRooms] = useState<any[]>([]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
